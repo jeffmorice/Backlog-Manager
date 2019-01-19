@@ -1,0 +1,25 @@
+Backlog Manager
+Web application designed to keep track of media users wish to view, to help decide which pieces of media are worth their time, and to increase enjoyment while reducing choice paralysis.
+
+Overview:
+Backlog Manager will enable consumers overwhelmed by the abundance of quality media today to keep track of every item on their list and decide which pieces of media are worth their time. Users add movie, tv, game, book or other media objects to a master list and voluntarily submit data regarding their level of interest and other relevant metrics. With this information the app will, at the user’s request, suggest items from the user’s own list back to them. After the user watches a movie, for example, they will be able to check it off their list, offer qualitative ratings, write reviews, and give further valuable feedback. As the app grows, it has the potential to become a full-featured lifestyle app to cultivate fun and reduce choice paralysis.
+
+The idea arose out of my own experience with choice paralysis. Old school channel surfing has given way to the “Netflix scroll.” I want to eliminate the boredom of searching for something to do in favor of decisive enjoyment.
+
+Features:
+•	Add media object to backlog: Users will be able to create new media objects of varying types. New objects will appear in the user's backlog list grouped by media type. Objects in list can be marked as completed, rated for level of interest, etc.
+•	User accounts: Users will be able to create accounts, log in to and out of the application.
+•	Suggestion Engine: Users will be able to request suggestions of media objects to enjoy, limited by input like mood, media type, length. Engine will supply the user with a limited selection of media to choose from. The number of choices will be configurable.
+•	Existing database API integration: App will utilize IMDB to populate movie results. Similar databases will be utilized for other media types, such as video games, tv shows, and books. The app may be updated to allow other media types.
+
+Technologies:
+•	C#
+•	.NET CORE
+•	MySQL
+•	Razor templates
+
+What I'll have to learn:
+I want to learn to use data from public APIs like IMDB. I want to make use of JavaScript to create a suitably interactive front end. I will experiment with presupposed methods of making quality suggestions to find the most effective solution. I will learn to track metrics to accrue potentially valuable user data on media consumption and enjoyment.
+
+Project Tracker:
+https://www.pivotaltracker.com/n/projects/2238891
