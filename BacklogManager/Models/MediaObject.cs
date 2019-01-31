@@ -17,7 +17,7 @@ namespace BacklogManager.Models
         [Required]
         public int DatabaseSource { get; set; }
         public bool Completed { get; set; } = false;
-        public bool Started { get; set; } = false;
+        public bool Started { get; set; }
         public bool Deleted { get; set; } = false;
         public int UpdateCount { get; set; } = 0;
         [Column(TypeName="date")]

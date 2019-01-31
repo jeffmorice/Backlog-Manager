@@ -6,25 +6,31 @@
 }
 
 <h2>Media</h2>
-@if (Model.Count == 0)
+@if (Model.Count != 0)
     {
-        <table>
-            <th>Title</th>
-            <th>Source</th>
-            <th>Started</th>
-            <th>Completed</th>
-            <th>Edit</th>
-            <th>Delete</th>
+        <table class="table">
+            <tr>
+                <th>Title</th>
+                <th>Source</th>
+                <th>Started</th>
+                <th>Completed</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
             @foreach (MediaObject mediaObject in Model)
             {
                 <tr>
                     <td>@mediaObject.Title</td>
                     <td>@mediaObject.RecommendSource</td>
                     <td>@mediaObject.Started</td>
-                    <td>@mediaObject.Completed</td>
+                    <td>@mediaObject.Completed</td>  @*If I want these to be checkboxes, I think I have to turn it into a form.*@
                     <td><a>Edit</a></td>
                     <td><a>Delete</a></td>
                 </tr>
             }
         </table>
-}
+    }
+else
+    { 
+        <p>No Media in list, <a asp-action="Add">Add some</a>.</p>
+    }
