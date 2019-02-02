@@ -8,7 +8,8 @@
 <h2>Media</h2>
 @if (Model.Count != 0)
     {
-        <form method="post" asp-action="DeletePrompt">
+        <form method="post" asp-action="Update">
+            <input type="submit" value="Save Changes" />
             <table class="table">
                 <tr>
                     <th>Title</th>
@@ -16,17 +17,26 @@
                     <th>Started</th>
                     <th>Completed</th>
                     <th>Edit</th>
-                    <th><input type="submit" value="Delete"/></th>
+                    <th>Delete</th>
                 </tr>
                 @foreach (MediaObject mediaObject in Model)
                 {
                     <tr>
-                        <td>@mediaObject.Title</td>
+                        <td>
+                            @mediaObject.Title
+                            <input type="hidden" name="mediaIds" id="@mediaObject.ID" value="@mediaObject.ID" />
+                        </td>
                         <td>@mediaObject.RecommendSource</td>
-                        <td>@mediaObject.Started</td>
-                        <td>@mediaObject.Completed</td>  @*If I want these to be checkboxes, I think I have to turn it into a form.*@
+                        <td>
+                            <input type="hidden" name="startedValues" id="@mediaObject.ID" value="0" />
+                            <input type="checkbox" name="startedValues" id="@mediaObject.ID" value="1" checked="@mediaObject.Started" />
+                        </td>
+                        <td>
+                            <input type="hidden" name="completedValues" id="@mediaObject.ID" value="0" />
+                            <input type="checkbox" name="completedValues" id="@mediaObject.ID" value="1" checked="@mediaObject.Completed" />
+                        </td>
                         <td><a>Edit</a></td>
-                        <td><input type="checkbox" name="mediaIds" id="@mediaObject.ID" value="@mediaObject.ID" /></td>
+                        <td><input type="checkbox" name="deletedIds" id="@mediaObject.ID" value="@mediaObject.ID" /></td>
                     </tr>
                 }
             </table>

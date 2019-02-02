@@ -12,7 +12,7 @@
         @foreach (MediaObject mediaObject in Model)
         {
             <tr>
-                <td><input type="checkbox" name="mediaIds" id="@mediaObject.ID" value="@mediaObject.ID" checked /></td>
+                <td><input type="checkbox" name="deletedIds" id="@mediaObject.ID" value="@mediaObject.ID" checked /></td>
                 <td>@mediaObject.Title</td>
             </tr>
         }
