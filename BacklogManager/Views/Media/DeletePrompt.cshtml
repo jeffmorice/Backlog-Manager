@@ -1,0 +1,23 @@
+﻿@model List<BacklogManager.Models.MediaObject>
+@using BacklogManager.Models
+
+@{
+    ViewData["Title"] = "Delete Items";
+}
+
+<h2>Media for deletion</h2>
+
+<form method="post" asp-action="Delete">
+    <table class="table">
+        @foreach (MediaObject mediaObject in Model)
+        {
+            <tr>
+                <td><input type="checkbox" name="mediaIds" id="@mediaObject.ID" value="@mediaObject.ID" checked /></td>
+                <td>@mediaObject.Title</td>
+            </tr>
+        }
+    </table>
+    <h4>Are you sure you want to delete the selected items?</h4>
+    <input type="submit" value="Yes" />
+    <button><a asp-action="Index" style="text-decoration:none">No</a></button>
+</form>

@@ -55,5 +55,37 @@ namespace BacklogManager.Controllers
             return View(addMediaObjectViewModel);
 
         }
+
+        [HttpPost]
+        public IActionResult DeletePrompt(int[] mediaIds)
+        {
+            List<MediaObject> mediaToDelete = new List<MediaObject>();
+
+            //get the id from the query
+            foreach (int mediaId in mediaIds)
+            {
+                //ToDo: Verify User owns item. If they do, then proceed with adding to list for deletion.
+                //Match id with media object and pass into View
+                mediaToDelete.Add(context.MediaObjects.Single(m => m.ID == mediaId));
+            }
+            
+            //Display prompt asking the user whether they would really like to delete this entry
+            return View(mediaToDelete);
+        }
+        
+        [HttpPost]
+        public IActionResult Delete(int[] mediaIds)
+        {
+            foreach (int mediaId in mediaIds)
+            {
+                MediaObject theMedia = context.MediaObjects.Single(m => m.ID == mediaId);
+
+                context.MediaObjects.Remove(theMedia);
+            }
+
+            context.SaveChanges();
+
+            return Redirect("/");
+        }
     }
 }
