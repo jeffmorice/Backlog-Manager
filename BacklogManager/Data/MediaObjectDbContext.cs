@@ -12,5 +12,7 @@ namespace BacklogManager.Data
         public DbSet<MediaObject> MediaObjects { get; set; }
 
         public MediaObjectDbContext(DbContextOptions<MediaObjectDbContext> options) : base(options) { }
+
+        public DbSet<SubType> SubTypes { get; set; }
     }
 }

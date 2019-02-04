@@ -1,0 +1,49 @@
+﻿@model List<BacklogManager.Models.SubType>
+@using BacklogManager.Models
+
+@{
+    ViewData["Title"] = "Media Sub-Types";
+}
+
+<h2>Media Sub-Types</h2>
+@if (Model.Count != 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Type ID</th>
+                <th>Type</th>
+                <th>Parent ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (SubType subtype in Model)
+            {
+            <tr>
+                <td>
+                    @subtype.ID
+                </td>
+                <td>
+                    @subtype.Name
+                </td>
+                <td>
+                    @subtype.ParentID
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@subtype.ID">Edit</a>
+                </td>
+                <td>
+                    <a asp-action="DeletePrompt" asp-route-id="@subtype.ID">Delete</a>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+    <p><a asp-action="Add">Add Sub-Types</a></p>
+}
+else
+{
+
+    <p>None in list, <a asp-action="Add">Add some</a>.</p>
+}
+
