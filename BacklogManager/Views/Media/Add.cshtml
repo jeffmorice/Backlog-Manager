@@ -18,9 +18,10 @@
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="MediaType" class="control-label"></label>
-                <input asp-for="MediaType" class="form-control" />
-                <span asp-validation-for="MediaType" class="text-danger"></span>
+                <label asp-for="SubTypeID" class="control-label"></label>
+                @*<input asp-for="SubTypeID" class="form-control" />*@
+                <select asp-for="SubTypeID" asp-items="Model.SubTypes"></select>
+                <span asp-validation-for="SubTypeID" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="DatabaseSource" class="control-label"></label>

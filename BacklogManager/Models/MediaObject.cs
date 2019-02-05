@@ -13,7 +13,9 @@ namespace BacklogManager.Models
         [Required]
         public string Title { get; set; }
         [Required]
-        public int MediaType { get; set; }
+        public SubType MediaSubType { get; set; }
+        [Required]
+        public int SubTypeID { get; set; }
         [Required]
         public int DatabaseSource { get; set; }
         public bool Completed { get; set; } = false;

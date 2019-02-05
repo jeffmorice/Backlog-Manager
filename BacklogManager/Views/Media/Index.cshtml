@@ -13,10 +13,10 @@
             <table class="table">
                 <tr>
                     <th>Title</th>
+                    <th>Media Type</th>
                     <th>Source</th>
                     <th>Started</th>
                     <th>Completed</th>
-                    <th>Edit</th>
                     <th>Delete</th>
                 </tr>
                 @foreach (MediaObject mediaObject in Model)
@@ -26,7 +26,10 @@
                             @mediaObject.Title
                             <input type="hidden" name="mediaIds" id="@mediaObject.ID" value="@mediaObject.ID" />
                         </td>
-                        <td>@mediaObject.RecommendSource</td>
+                        <td>SubType Select here</td>
+                        <td>
+                            @mediaObject.RecommendSource
+                        </td>
                         <td>
                             <input type="hidden" name="startedValues" id="@mediaObject.ID" value="0" />
                             <input type="checkbox" name="startedValues" id="@mediaObject.ID" value="1" checked="@mediaObject.Started" />
@@ -35,7 +38,6 @@
                             <input type="hidden" name="completedValues" id="@mediaObject.ID" value="0" />
                             <input type="checkbox" name="completedValues" id="@mediaObject.ID" value="1" checked="@mediaObject.Completed" />
                         </td>
-                        <td><a>Edit</a></td>
                         <td><input type="checkbox" name="deletedIds" id="@mediaObject.ID" value="@mediaObject.ID" /></td>
                     </tr>
                 }

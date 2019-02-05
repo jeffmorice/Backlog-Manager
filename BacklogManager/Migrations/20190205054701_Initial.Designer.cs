@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BacklogManager.Migrations
 {
     [DbContext(typeof(MediaObjectDbContext))]
-    [Migration("20190204010805_AddSubTypes")]
-    partial class AddSubTypes
+    [Migration("20190205054701_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -36,11 +36,11 @@ namespace BacklogManager.Migrations
 
                     b.Property<bool>("Deleted");
 
-                    b.Property<int>("MediaType");
-
                     b.Property<string>("RecommendSource");
 
                     b.Property<bool>("Started");
+
+                    b.Property<int>("SubTypeID");
 
                     b.Property<string>("Title")
                         .IsRequired();
@@ -48,6 +48,8 @@ namespace BacklogManager.Migrations
                     b.Property<int>("UpdateCount");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("SubTypeID");
 
                     b.ToTable("MediaObjects");
                 });
@@ -65,6 +67,14 @@ namespace BacklogManager.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("SubTypes");
+                });
+
+            modelBuilder.Entity("BacklogManager.Models.MediaObject", b =>
+                {
+                    b.HasOne("BacklogManager.Models.SubType", "MediaSubType")
+                        .WithMany()
+                        .HasForeignKey("SubTypeID")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

@@ -6,6 +6,7 @@ using BacklogManager.Data;
 using Microsoft.AspNetCore.Mvc;
 using BacklogManager.Models;
 using BacklogManager.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace BacklogManager.Controllers
 {
@@ -20,14 +21,14 @@ namespace BacklogManager.Controllers
 
         public IActionResult Index()
         {
-            List<MediaObject> mediaList = context.MediaObjects.ToList();
+            IList<MediaObject> mediaOjects = context.MediaObjects.Include(s => s.MediaSubType).ToList();
 
-            return View(mediaList);
+            return View(mediaOjects);
         }
 
         public IActionResult Add()
         {
-            AddMediaObjectViewModel addMediaObjectViewModel = new AddMediaObjectViewModel();
+            AddMediaObjectViewModel addMediaObjectViewModel = new AddMediaObjectViewModel(context.SubTypes.ToList());
 
             return View(addMediaObjectViewModel);
         }
@@ -40,7 +41,8 @@ namespace BacklogManager.Controllers
                 MediaObject newMediaObject = new MediaObject
                 {
                     Title = addMediaObjectViewModel.Title,
-                    MediaType = addMediaObjectViewModel.MediaType,
+                    SubTypeID = addMediaObjectViewModel.SubTypeID,
+                    MediaSubType = context.SubTypes.Single(s => s.ID == addMediaObjectViewModel.SubTypeID),
                     DatabaseSource = addMediaObjectViewModel.DatabaseSource,
                     Started = addMediaObjectViewModel.Started,
                     DateAdded = DateTime.Now, //.ToString("yyyy-MM-dd"), //preferred format
