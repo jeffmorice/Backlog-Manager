@@ -21,9 +21,13 @@ namespace BacklogManager.Controllers
 
         public IActionResult Index()
         {
-            IList<MediaObject> mediaOjects = context.MediaObjects.Include(s => s.MediaSubType).ToList();
-
-            return View(mediaOjects);
+            MediaIndexViewModel mediaIndexViewModel = new MediaIndexViewModel
+            {
+                MediaOjects = context.MediaObjects.Include(s => s.MediaSubType).ToList(),
+                UpdateMediaObjectViewModel = new UpdateMediaObjectViewModel()
+            };
+            
+            return View(mediaIndexViewModel);
         }
 
         public IActionResult Add()
@@ -77,6 +81,7 @@ namespace BacklogManager.Controllers
             {
                 MediaObject theMedia = context.MediaObjects.Single(m => m.ID == deletedId);
 
+                //set deleted field to true rather than removing
                 context.MediaObjects.Remove(theMedia);
             }
 
@@ -86,63 +91,62 @@ namespace BacklogManager.Controllers
         }
 
         [HttpPost]
-        public IActionResult Update(int[] mediaIds, int[] startedValues, int[] completedValues, int[] deletedIds)
+        public IActionResult Update(UpdateMediaObjectViewModel updateMediaObjectViewModel)
         {
             //ToDo: allow for text fields to be updated via form input.
-            int mediaAccumulator = 0;
-            int startedAccumulator = 0;
-            int completedAccumulator = 0;
-            
-            foreach (int mediaId in mediaIds)
+            //ToDo: complete Update logic using ViewModel
+            if (ModelState.IsValid)
             {
-                MediaObject updatedMedia = context.MediaObjects.Single(m => m.ID == mediaId);
+                int i = 0;
 
-                if ((mediaAccumulator + startedAccumulator + 1) < startedValues.Length)
-                {
-                    if (startedValues[mediaAccumulator + startedAccumulator + 1] == 1)
-                    {
-                        updatedMedia.Started = true;
-                        startedAccumulator += 1;
-                    }
-                    else
-                    {
-                        updatedMedia.Started = false;
-                    }
-                }
-                else if ((mediaAccumulator + startedAccumulator + 1) == startedValues.Length)
-                {
-                    updatedMedia.Started = false;
-                }
+                //strip double values
+                //started
+                List<bool> startedBools = StripAndConvertIntArrayToListBool(updateMediaObjectViewModel.StartedValues);
+                //completed
+                List<bool> completedBools = StripAndConvertIntArrayToListBool(updateMediaObjectViewModel.CompletedValues);
 
-                if ((mediaAccumulator + completedAccumulator + 1) < completedValues.Length)
-                {
-                    if (completedValues[mediaAccumulator + completedAccumulator + 1] == 1)
-                    {
-                        updatedMedia.Completed = true;
-                        completedAccumulator += 1;
-                    }
-                    else
-                    {
-                        updatedMedia.Completed = false;
-                    }
-                }
-                else if ((mediaAccumulator + completedAccumulator + 1) == completedValues.Length)
-                {
-                    updatedMedia.Completed = false;
-                }
+                //convert binary values to bools
+                    //started
+                    //completed
 
-                //ToDo: Add UpdateCount logic. Check if initial values matches end values. If any columns do not match, add 1.
-                mediaAccumulator += 1;
+                foreach (int ID in updateMediaObjectViewModel.MediaIDs)
+                {
+                    //find media object in database
+                    MediaObject updateCandidate = context.MediaObjects.Single(m => m.ID == ID);
+                    bool countUpdate = false;
+
+                    //check if Started value has changed, then add to UpdateCount
+                    //compare existing value to new value
+                    if (updateCandidate.Started != startedBools[i])
+                    {
+                        //then update
+                        updateCandidate.Started = startedBools[i];
+                        countUpdate = true;
+                    }
+                    //check if Completed value has changed
+                    if (updateCandidate.Completed != completedBools[i])
+                    {
+                        //then update
+                        updateCandidate.Completed = completedBools[i];
+                        countUpdate = true;
+                    }
+                    if (countUpdate)
+                    {
+                        updateCandidate.UpdateCount += 1;
+                    }
+
+                    i++;
+                }
             }
 
             //Save changes
             context.SaveChanges();
 
             //Then check for deleted Ids and pass any to the DeletePrompt route
-            if (deletedIds.Length > 0)
+            if (updateMediaObjectViewModel.DeletedIDs != null)
             {
                 List<MediaObject> mediaToDelete = new List<MediaObject>();
-                mediaToDelete = ArrayIdsToListMediaObjects(deletedIds);
+                mediaToDelete = ArrayIdsToListMediaObjects(updateMediaObjectViewModel.DeletedIDs);
                 return View("DeletePrompt", mediaToDelete);
             }
 
@@ -159,5 +163,68 @@ namespace BacklogManager.Controllers
             }
             return mediaList;
         }
+
+        public List<int> StripDoubleValues(int[] values)
+        {
+            //Checkbox values come in from the form in 2 parts, a 0 for hidden input and 1 only if box is checked. A 0 followed by a 1 can be ignored. It is easier to deal with them if we strip the duplicate values.
+            List<int> doubleValues = new List<int>(values);
+            List<int> singleValues = new List<int>();
+
+            int singleValueIndex = -1;
+
+            for (int i = 0; i < doubleValues.Count; i++)
+            {
+                singleValues.Add(doubleValues[i]);
+                singleValueIndex += 1;
+
+                if (doubleValues[i] == 1)
+                {
+                    singleValues.RemoveAt(singleValueIndex - 1);
+                    singleValueIndex -= 1;
+                }
+            }
+
+            return singleValues;
+        }
+
+        public bool BinarytoBool(int binaryValue)
+        {
+            bool boolean = new bool();
+
+            if (binaryValue == 0) {boolean = false;}
+            else if (binaryValue == 1) {boolean = true;}
+            else
+            {
+                //throw exception
+            }
+
+            return boolean;
+        }
+
+        public List<bool> ListBinaryToListBool(List<int> binaryValues)
+        {
+            List<bool> bools = new List<bool>();
+            
+            foreach (int binaryValue in binaryValues)
+            {
+                bools.Add(BinarytoBool(binaryValue));
+            }
+
+            return bools;
+        }
+        
+        public List<bool> StripAndConvertIntArrayToListBool(int[] binaryValues)
+        {
+            //interprets form data
+            //strip the values: outputs a list of ints
+            List<int> strippedValues = StripDoubleValues(binaryValues);
+
+            //convert to a list of bools
+            List<bool> boolValues = ListBinaryToListBool(strippedValues);
+
+            return boolValues;
+        }
+
+        
     }
 }

@@ -1,4 +1,5 @@
-﻿@model List<BacklogManager.Models.MediaObject>
+﻿@model BacklogManager.ViewModels.MediaIndexViewModel
+@*List<BacklogManager.Models.MediaObject>*@
 @using BacklogManager.Models
 
 @{
@@ -6,7 +7,7 @@
 }
 
 <h2>Media</h2>
-@if (Model.Count != 0)
+@if (Model.MediaOjects.Count != 0)
     {
         <form method="post" asp-action="Update">
             <input type="submit" value="Save Changes" />
@@ -19,7 +20,7 @@
                     <th>Completed</th>
                     <th>Delete</th>
                 </tr>
-                @foreach (MediaObject mediaObject in Model)
+                @foreach (MediaObject mediaObject in Model.MediaOjects)
                 {
                     <tr>
                         <td>
