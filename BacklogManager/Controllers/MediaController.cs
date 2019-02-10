@@ -80,9 +80,8 @@ namespace BacklogManager.Controllers
             foreach (int deletedId in deletedIds)
             {
                 MediaObject theMedia = context.MediaObjects.Single(m => m.ID == deletedId);
-
-                //set deleted field to true rather than removing
-                context.MediaObjects.Remove(theMedia);
+                
+                theMedia.Deleted = true;
             }
 
             context.SaveChanges();
