@@ -23,7 +23,7 @@ namespace BacklogManager.Controllers
         {
             MediaIndexViewModel mediaIndexViewModel = new MediaIndexViewModel
             {
-                MediaOjects = context.MediaObjects.Include(s => s.MediaSubType).ToList(),
+                MediaOjects = context.MediaObjects.Include(s => s.MediaSubType).Where(d => d.Deleted == false).ToList(),
                 UpdateMediaObjectViewModel = new UpdateMediaObjectViewModel()
             };
             
