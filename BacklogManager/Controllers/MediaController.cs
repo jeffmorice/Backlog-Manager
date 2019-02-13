@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using BacklogManager.Models;
 using BacklogManager.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BacklogManager.Controllers
 {
+    [Authorize]
     public class MediaController : Controller
     {
         private readonly MediaObjectDbContext context;

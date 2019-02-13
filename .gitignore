@@ -261,3 +261,5 @@ __pycache__/
 *.pyc
 /BacklogManager/Controllers/ReferenceController.cs
 /UncreatedTablesNotes.txt
+/BacklogManager/ScaffoldingReadme.txt
+/Notes.txt
