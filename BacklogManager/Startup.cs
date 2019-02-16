@@ -98,7 +98,7 @@ namespace BacklogManager
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Media}/{action=Index}/{id?}");
+                    template: "{controller=Home}/{action=Index}/{id?}");
             });
 
             CreateRoles(serviceProvider).Wait();
