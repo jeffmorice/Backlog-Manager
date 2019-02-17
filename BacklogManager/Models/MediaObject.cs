@@ -27,6 +27,7 @@ namespace BacklogManager.Models
         //[Column(TypeName="time")]
         //public DateTime TimeAdded { get; set; }
         public string RecommendSource { get; set; }
+        public string OwnerId { get; set; }
 
         public MediaObject() { }
     }
