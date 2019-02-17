@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BacklogManager.Controllers
 {
-    [Authorize(Roles= "Administrator")]
+    //[Authorize(Roles= "Administrator")]
     public class SubTypeController : Controller
     {
         private readonly MediaObjectDbContext context;

@@ -8,10 +8,12 @@ using BacklogManager.Models;
 using BacklogManager.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace BacklogManager.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class MediaController : Controller
     {
         private readonly MediaObjectDbContext context;
@@ -23,9 +25,13 @@ namespace BacklogManager.Controllers
 
         public IActionResult Index()
         {
+            //ClaimsPrincipal currentUser = User;
+            //string currentUserId = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
+
             MediaIndexViewModel mediaIndexViewModel = new MediaIndexViewModel
             {
                 MediaOjects = context.MediaObjects.Include(s => s.MediaSubType).Where(d => d.Deleted == false).ToList(),
+                //MediaOjects = context.MediaObjects.Include(s => s.MediaSubType).Where(u => u.OwnerId == currentUserId).Where(d => d.Deleted == false).ToList(),
                 UpdateMediaObjectViewModel = new UpdateMediaObjectViewModel()
             };
             

@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using BacklogManager.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace BacklogManager
 {
@@ -33,6 +34,8 @@ namespace BacklogManager
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+
+            //services.ConfigureApplicationCookie(options => options.LoginPath = "/Home/Index");
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -71,6 +74,8 @@ namespace BacklogManager
                 .AddDefaultTokenProviders();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            //services.AddSingleton<IEmailSender, EmailSender>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -89,7 +94,6 @@ namespace BacklogManager
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseAuthentication();
             app.UseCookiePolicy();
 
             app.UseAuthentication();
@@ -98,7 +102,7 @@ namespace BacklogManager
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Media}/{action=Index}/{id?}");
             });
 
             CreateRoles(serviceProvider).Wait();
