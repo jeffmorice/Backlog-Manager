@@ -29,7 +29,10 @@ namespace BacklogManager.Controllers
 
             MediaIndexViewModel mediaIndexViewModel = new MediaIndexViewModel
             {
-                MediaOjects = context.MediaObjects.Include(s => s.MediaSubType).Where(u => u.OwnerId == userId).Where(d => d.Deleted == false).ToList(),
+                MediaOjects = context.MediaObjects.
+                Include(s => s.MediaSubType).
+                Where(u => u.OwnerId == userId).
+                Where(d => d.Deleted == false).ToList(),
                 UpdateMediaObjectViewModel = new UpdateMediaObjectViewModel()
             };
             
@@ -86,13 +89,21 @@ namespace BacklogManager.Controllers
         }
         
         [HttpPost]
+        //[Authorize]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int[] deletedIds)
         {
+            string userId = Common.ExtensionMethods.getUserId(this.User);
+
             foreach (int deletedId in deletedIds)
             {
                 MediaObject theMedia = context.MediaObjects.Single(m => m.ID == deletedId);
                 
-                theMedia.Deleted = true;
+                if (userId == theMedia.OwnerId)
+                {
+                    theMedia.Deleted = true;
+                }
+                
             }
 
             context.SaveChanges();
@@ -118,6 +129,7 @@ namespace BacklogManager.Controllers
                 //convert binary values to bools
                     //started
                     //completed
+                
 
                 foreach (int ID in updateMediaObjectViewModel.MediaIDs)
                 {
@@ -125,24 +137,29 @@ namespace BacklogManager.Controllers
                     MediaObject updateCandidate = context.MediaObjects.Single(m => m.ID == ID);
                     bool countUpdate = false;
 
-                    //check if Started value has changed, then add to UpdateCount
-                    //compare existing value to new value
-                    if (updateCandidate.Started != startedBools[i])
+                    string userId = Common.ExtensionMethods.getUserId(this.User);
+
+                    if (userId == updateCandidate.OwnerId)
                     {
-                        //then update
-                        updateCandidate.Started = startedBools[i];
-                        countUpdate = true;
-                    }
-                    //check if Completed value has changed
-                    if (updateCandidate.Completed != completedBools[i])
-                    {
-                        //then update
-                        updateCandidate.Completed = completedBools[i];
-                        countUpdate = true;
-                    }
-                    if (countUpdate)
-                    {
-                        updateCandidate.UpdateCount += 1;
+                        //check if Started value has changed, then add to UpdateCount
+                        //compare existing value to new value
+                        if (updateCandidate.Started != startedBools[i])
+                        {
+                            //then update
+                            updateCandidate.Started = startedBools[i];
+                            countUpdate = true;
+                        }
+                        //check if Completed value has changed
+                        if (updateCandidate.Completed != completedBools[i])
+                        {
+                            //then update
+                            updateCandidate.Completed = completedBools[i];
+                            countUpdate = true;
+                        }
+                        if (countUpdate)
+                        {
+                            updateCandidate.UpdateCount += 1;
+                        }
                     }
 
                     i++;
