@@ -25,7 +25,13 @@ namespace BacklogManager.Controllers
 
         public IActionResult Index()
         {
+            //ToDo: replace temporary redirect solution with proper Authorization implementation.
             string userId = Common.ExtensionMethods.getUserId(this.User);
+
+            if (userId == null)
+            {
+                return Redirect("/Identity/Account/Login");
+            }
 
             MediaIndexViewModel mediaIndexViewModel = new MediaIndexViewModel
             {
@@ -41,6 +47,14 @@ namespace BacklogManager.Controllers
 
         public IActionResult Add()
         {
+            //ToDo: replace temporary redirect solution with proper Authorization implementation.
+            string userId = Common.ExtensionMethods.getUserId(this.User);
+
+            if (userId == null)
+            {
+                return Redirect("/Identity/Account/Login");
+            }
+
             AddMediaObjectViewModel addMediaObjectViewModel = new AddMediaObjectViewModel(context.SubTypes.ToList());
 
             return View(addMediaObjectViewModel);
@@ -52,6 +66,12 @@ namespace BacklogManager.Controllers
         public IActionResult Add(AddMediaObjectViewModel addMediaObjectViewModel)
         {
             string userId = Common.ExtensionMethods.getUserId(this.User);
+
+            //ToDo: replace temporary redirect solution with proper Authorization implementation.
+            if (userId == null)
+            {
+                return Redirect("/Identity/Account/Login");
+            }
 
             if (ModelState.IsValid)
             {
@@ -79,6 +99,14 @@ namespace BacklogManager.Controllers
         [HttpPost]
         public IActionResult DeletePrompt(int[] deletedIds)
         {
+            //ToDo: replace temporary redirect solution with proper Authorization implementation.
+            string userId = Common.ExtensionMethods.getUserId(this.User);
+
+            if (userId == null)
+            {
+                return Redirect("/Identity/Account/Login");
+            }
+
             //write List<int> to List<MediaObject> method and invoke here
             List<MediaObject> mediaToDelete = new List<MediaObject>();
 
@@ -94,6 +122,12 @@ namespace BacklogManager.Controllers
         public IActionResult Delete(int[] deletedIds)
         {
             string userId = Common.ExtensionMethods.getUserId(this.User);
+
+            //ToDo: replace temporary redirect solution with proper Authorization implementation.
+            if (userId == null)
+            {
+                return Redirect("/Identity/Account/Login");
+            }
 
             foreach (int deletedId in deletedIds)
             {
@@ -114,8 +148,15 @@ namespace BacklogManager.Controllers
         [HttpPost]
         public IActionResult Update(UpdateMediaObjectViewModel updateMediaObjectViewModel)
         {
+            string userId = Common.ExtensionMethods.getUserId(this.User);
+            
+            //ToDo: replace temporary redirect solution with proper Authorization implementation.
+            if (userId == null)
+            {
+                return Redirect("/Identity/Account/Login");
+            }
+
             //ToDo: allow for text fields to be updated via form input.
-            //ToDo: complete Update logic using ViewModel
             if (ModelState.IsValid)
             {
                 int i = 0;
@@ -125,19 +166,12 @@ namespace BacklogManager.Controllers
                 List<bool> startedBools = StripAndConvertIntArrayToListBool(updateMediaObjectViewModel.StartedValues);
                 //completed
                 List<bool> completedBools = StripAndConvertIntArrayToListBool(updateMediaObjectViewModel.CompletedValues);
-
-                //convert binary values to bools
-                    //started
-                    //completed
                 
-
                 foreach (int ID in updateMediaObjectViewModel.MediaIDs)
                 {
                     //find media object in database
                     MediaObject updateCandidate = context.MediaObjects.Single(m => m.ID == ID);
                     bool countUpdate = false;
-
-                    string userId = Common.ExtensionMethods.getUserId(this.User);
 
                     if (userId == updateCandidate.OwnerId)
                     {
@@ -251,7 +285,5 @@ namespace BacklogManager.Controllers
 
             return boolValues;
         }
-
-        
     }
 }

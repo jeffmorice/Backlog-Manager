@@ -24,6 +24,12 @@ namespace BacklogManager.Controllers
 
         public IActionResult Index()
         {
+            //ToDo: replace temporary redirect solution with proper Role-based Authorization implementation.
+            if (!this.User.IsInRole("Administrator"))
+            {
+                return View("Unauthorized");
+            }
+
             List<SubType> subTypeList = context.SubTypes.ToList();
 
             return View(subTypeList);
@@ -31,6 +37,12 @@ namespace BacklogManager.Controllers
 
         public IActionResult Add()
         {
+            //ToDo: replace temporary redirect solution with proper Role-based Authorization implementation.
+            if (!this.User.IsInRole("Administrator"))
+            {
+                return View("Unauthorized");
+            }
+
             AddSubTypeViewModel addSubTypeViewModel = new AddSubTypeViewModel();
 
             return View(addSubTypeViewModel);
@@ -39,6 +51,12 @@ namespace BacklogManager.Controllers
         [HttpPost]
         public IActionResult Add(AddSubTypeViewModel addSubTypeViewModel)
         {
+            //ToDo: replace temporary redirect solution with proper Role-based Authorization implementation.
+            if (!this.User.IsInRole("Administrator"))
+            {
+                return View("Unauthorized");
+            }
+
             if (ModelState.IsValid)
             {
                 SubType newSubType = new SubType
@@ -58,6 +76,12 @@ namespace BacklogManager.Controllers
         // GET: Reference/Delete/5
         public ActionResult DeletePrompt(int id)
         {
+            //ToDo: replace temporary redirect solution with proper Role-based Authorization implementation.
+            if (!this.User.IsInRole("Administrator"))
+            {
+                return View("Unauthorized");
+            }
+
             SubType theSubType = context.SubTypes.Single(m => m.ID == id);
 
             return View(theSubType);
@@ -68,6 +92,12 @@ namespace BacklogManager.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id)
         {
+            //ToDo: replace temporary redirect solution with proper Role-based Authorization implementation.
+            if (!this.User.IsInRole("Administrator"))
+            {
+                return View("Unauthorized");
+            }
+
             try
             {
                 SubType theMedia = context.SubTypes.Single(m => m.ID == id);
@@ -86,6 +116,12 @@ namespace BacklogManager.Controllers
 
         public ActionResult Edit(int id)
         {
+            //ToDo: replace temporary redirect solution with proper Role-based Authorization implementation.
+            if (!this.User.IsInRole("Administrator"))
+            {
+                return View("Unauthorized");
+            }
+
             EditSubTypeViewModel editSubTypeViewModel = new EditSubTypeViewModel();
 
             SubType theSubType = context.SubTypes.Single(m => m.ID == id);
@@ -101,6 +137,12 @@ namespace BacklogManager.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(EditSubTypeViewModel editSubTypeViewModel)
         {
+            //ToDo: replace temporary redirect solution with proper Role-based Authorization implementation.
+            if (!this.User.IsInRole("Administrator"))
+            {
+                return View("Unauthorized");
+            }
+
             try
             {
                 SubType theSubType = context.SubTypes.Single(m => m.ID == editSubTypeViewModel.ID);
