@@ -25,13 +25,11 @@ namespace BacklogManager.Controllers
 
         public IActionResult Index()
         {
-            //ClaimsPrincipal currentUser = User;
-            //string currentUserId = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
+            string userId = Common.ExtensionMethods.getUserId(this.User);
 
             MediaIndexViewModel mediaIndexViewModel = new MediaIndexViewModel
             {
-                MediaOjects = context.MediaObjects.Include(s => s.MediaSubType).Where(d => d.Deleted == false).ToList(),
-                //MediaOjects = context.MediaObjects.Include(s => s.MediaSubType).Where(u => u.OwnerId == currentUserId).Where(d => d.Deleted == false).ToList(),
+                MediaOjects = context.MediaObjects.Include(s => s.MediaSubType).Where(u => u.OwnerId == userId).Where(d => d.Deleted == false).ToList(),
                 UpdateMediaObjectViewModel = new UpdateMediaObjectViewModel()
             };
             
@@ -46,8 +44,12 @@ namespace BacklogManager.Controllers
         }
 
         [HttpPost]
+        //[Authorize]
+        [ValidateAntiForgeryToken]
         public IActionResult Add(AddMediaObjectViewModel addMediaObjectViewModel)
         {
+            string userId = Common.ExtensionMethods.getUserId(this.User);
+
             if (ModelState.IsValid)
             {
                 MediaObject newMediaObject = new MediaObject
@@ -58,7 +60,8 @@ namespace BacklogManager.Controllers
                     DatabaseSource = addMediaObjectViewModel.DatabaseSource,
                     Started = addMediaObjectViewModel.Started,
                     DateAdded = DateTime.Now, //.ToString("yyyy-MM-dd"), //preferred format
-                    RecommendSource = addMediaObjectViewModel.RecommendSource
+                    RecommendSource = addMediaObjectViewModel.RecommendSource,
+                    OwnerId = userId
                 };
 
                 context.MediaObjects.Add(newMediaObject);
