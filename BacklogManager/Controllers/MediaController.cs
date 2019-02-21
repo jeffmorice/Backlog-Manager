@@ -7,9 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 using BacklogManager.Models;
 using BacklogManager.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace BacklogManager.Controllers
 {
+    //[Authorize]
     public class MediaController : Controller
     {
         private readonly MediaObjectDbContext context;
@@ -21,12 +25,14 @@ namespace BacklogManager.Controllers
 
         public IActionResult Index()
         {
+            string userId = Common.ExtensionMethods.getUserId(this.User);
+
             MediaIndexViewModel mediaIndexViewModel = new MediaIndexViewModel
             {
-                MediaOjects = context.MediaObjects.Include(s => s.MediaSubType).Where(d => d.Deleted == false).ToList(),
+                MediaOjects = context.MediaObjects.Include(s => s.MediaSubType).Where(u => u.OwnerId == userId).Where(d => d.Deleted == false).ToList(),
                 UpdateMediaObjectViewModel = new UpdateMediaObjectViewModel()
             };
-            
+
             return View(mediaIndexViewModel);
         }
 
@@ -38,8 +44,12 @@ namespace BacklogManager.Controllers
         }
 
         [HttpPost]
+        //[Authorize]
+        [ValidateAntiForgeryToken]
         public IActionResult Add(AddMediaObjectViewModel addMediaObjectViewModel)
         {
+            string userId = Common.ExtensionMethods.getUserId(this.User);
+
             if (ModelState.IsValid)
             {
                 MediaObject newMediaObject = new MediaObject
@@ -50,7 +60,8 @@ namespace BacklogManager.Controllers
                     DatabaseSource = addMediaObjectViewModel.DatabaseSource,
                     Started = addMediaObjectViewModel.Started,
                     DateAdded = DateTime.Now, //.ToString("yyyy-MM-dd"), //preferred format
-                    RecommendSource = addMediaObjectViewModel.RecommendSource
+                    RecommendSource = addMediaObjectViewModel.RecommendSource,
+                    OwnerId = userId
                 };
 
                 context.MediaObjects.Add(newMediaObject);
@@ -73,14 +84,14 @@ namespace BacklogManager.Controllers
             //Display prompt asking the user whether they would really like to delete this entry
             return View(mediaToDelete);
         }
-        
+
         [HttpPost]
         public IActionResult Delete(int[] deletedIds)
         {
             foreach (int deletedId in deletedIds)
             {
                 MediaObject theMedia = context.MediaObjects.Single(m => m.ID == deletedId);
-                
+
                 theMedia.Deleted = true;
             }
 
@@ -105,8 +116,8 @@ namespace BacklogManager.Controllers
                 List<bool> completedBools = StripAndConvertIntArrayToListBool(updateMediaObjectViewModel.CompletedValues);
 
                 //convert binary values to bools
-                    //started
-                    //completed
+                //started
+                //completed
 
                 foreach (int ID in updateMediaObjectViewModel.MediaIDs)
                 {
@@ -155,7 +166,7 @@ namespace BacklogManager.Controllers
         public List<MediaObject> ArrayIdsToListMediaObjects(int[] arrayIds)
         {
             List<MediaObject> mediaList = new List<MediaObject>();
-            
+
             foreach (int arrayId in arrayIds)
             {
                 mediaList.Add(context.MediaObjects.Single(m => m.ID == arrayId));
@@ -190,8 +201,8 @@ namespace BacklogManager.Controllers
         {
             bool boolean = new bool();
 
-            if (binaryValue == 0) {boolean = false;}
-            else if (binaryValue == 1) {boolean = true;}
+            if (binaryValue == 0) { boolean = false; }
+            else if (binaryValue == 1) { boolean = true; }
             else
             {
                 //throw exception
@@ -203,7 +214,7 @@ namespace BacklogManager.Controllers
         public List<bool> ListBinaryToListBool(List<int> binaryValues)
         {
             List<bool> bools = new List<bool>();
-            
+
             foreach (int binaryValue in binaryValues)
             {
                 bools.Add(BinarytoBool(binaryValue));
@@ -211,7 +222,7 @@ namespace BacklogManager.Controllers
 
             return bools;
         }
-        
+
         public List<bool> StripAndConvertIntArrayToListBool(int[] binaryValues)
         {
             //interprets form data
@@ -224,6 +235,6 @@ namespace BacklogManager.Controllers
             return boolValues;
         }
 
-        
+
     }
 }
