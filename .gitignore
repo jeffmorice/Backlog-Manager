@@ -265,3 +265,5 @@ __pycache__/
 /Notes.txt
 /GetIdentityUserId.PNG
 /BacklogManager/ScaffoldingReadme.txt
+/BacklogManager/Common/OMDbClient.cs
+/Notes
