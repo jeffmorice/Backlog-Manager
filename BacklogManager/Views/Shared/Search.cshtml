@@ -1,0 +1,70 @@
+﻿@model List<BacklogManager.Models.OMDbTitle>
+
+@{
+    ViewData["Title"] = "Search";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Search</h2>
+
+@* If searching for a movie, TV series, or TV episode, enter a search term *@
+<div>
+    <p>To add a Movie, TV series or episode, search for your title here.</p>
+    <form method="get" asp-controller="OMDb" asp-action="Index">
+        <table class="table">
+            <tr>
+                <th><label>Title</label></th>
+                <th><label>Year</label></th>
+                <th><label>Type</label></th>
+            </tr>
+            <tr>
+                <td><input type="text" name="title" /></td>
+                <td><input type="number" name="year" /></td>
+                <td>
+                    <select name="type" id="type">
+                        <option value="null">------</option>
+                        <option value="movie">Movie</option>
+                        <option value="series">Series</option>
+                        <option value="episode">Episode</option>
+                    </select>
+                </td>
+                <td><input type="hidden" name="search" value="true"/><input type="submit" value="Search" class="btn btn-default" /></td>
+            </tr>
+            
+        </table>
+    </form>
+    <table class="table">
+        @* If model != null, display search results *@
+        @if (Model.Count != 0)
+        {
+            @if (Model[0].ImdbId != null)
+            {
+                @foreach (OMDbTitle title in Model)
+                {
+                    <tr>
+                        <td>
+                            <a href="https://www.imdb.com/title/@title.ImdbId" >@title.Title</a>
+                        </td>
+                        <td>@title.Year</td>
+                        <td>@title.Type</td>
+                        <td>
+                            <form method="get" asp-controller="Media" asp-action="Add">
+                                <input type="hidden" name="imdbId" value="@title.ImdbId" />
+                                <input type="hidden" name="title" value="@title.Title"/>
+                                <input type="hidden" name="type" value="@title.Type" />
+                                <input type="submit" value="Add" />
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <p>No results</p>
+            }
+        }
+    </table>
+</div>
+
+@* If not, click through to add a generic MediaObject *@
+<p><a asp-action="Add">Click here</a> to add another form of media</p>

@@ -18,11 +18,34 @@ namespace BacklogManager.Controllers
         //Hosted web API REST Service base url
         string baseUrl = "https://www.omdbapi.com/";
 
-        [HttpGet]
-        public async Task<ActionResult> Index()
+        //ToDo: add parameters title, year, and type
+        //ToDo: add request string contruction logic
+        //ToDo: Pass List of OMDbTitle objects to Search view.
+        [HttpGet]     //needs to be a get
+        public async Task<ActionResult> Index(string title, string year, string type, bool search)
         {
             //use try, except here to catch network errors and user input errors
             List<OMDbTitle> omdbTitles = new List<OMDbTitle>();
+
+            string requestString = baseUrl + "?apikey=" + omdbClient.ApiKey;
+
+            //construct request string
+            if (search == true)
+            {
+                if(title != null)
+                {
+                    requestString = requestString + "&s=" + title;
+                    if (year != null)
+                    {
+                        requestString = requestString + "&y=" + year;
+                    }
+                    if (type != null)
+                    {
+                        requestString = requestString + "&type=" + type;
+                    }
+                }
+            }
+
 
             using (var client = new HttpClient())
             {
@@ -36,7 +59,7 @@ namespace BacklogManager.Controllers
 
                 //Sending request to find web api REST service resource
                 //I predict I will need to tweak how the request string is constructed.
-                HttpResponseMessage response = await client.GetAsync(baseUrl + "?apikey=" + omdbClient.ApiKey + "&s=Blade%20Runner");
+                HttpResponseMessage response = await client.GetAsync(requestString);
 
                 //Checking if the response, sent using HttpClient, is successful or not
                 if (response.IsSuccessStatusCode)
@@ -44,7 +67,7 @@ namespace BacklogManager.Controllers
                     omdbTitles = JsonToListOmdbTitles(response);
                 }
                 //returning OMDbTitle list to view
-                return View(omdbTitles);
+                return View("Search", omdbTitles);
                 //return View("Index", responseString);
             }
         }

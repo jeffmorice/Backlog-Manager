@@ -22,6 +22,7 @@ namespace BacklogManager.ViewModels
         public bool Started { get; set; }
         [Display(Name = "How did you hear about it? Who recommended it to you?")]
         public string RecommendSource { get; set; }
+        public string ExternalId { get; set; }
 
         public List<SelectListItem> SubTypes { get; set; }
 

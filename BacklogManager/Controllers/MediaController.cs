@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using BacklogManager.Common;
+using System.Net.Http;
 
 namespace BacklogManager.Controllers
 {
@@ -22,6 +24,8 @@ namespace BacklogManager.Controllers
         {
             context = dbContext;
         }
+
+        //Actions
 
         public IActionResult Index()
         {
@@ -39,9 +43,21 @@ namespace BacklogManager.Controllers
             return View(mediaIndexViewModel);
         }
 
-        public IActionResult Add()
+        //consider using a ViewModel here when more apis will be passing their own values here.
+        public IActionResult Add(string imdbId, string title, string type)
         {
+
             AddMediaObjectViewModel addMediaObjectViewModel = new AddMediaObjectViewModel(context.SubTypes.ToList());
+
+            //If I can't pass a whole object as a parameter here, I can send a request to the api, but that's a crappy solution.
+            if (imdbId != null & title != null)
+            {
+                addMediaObjectViewModel.Title = title;
+                addMediaObjectViewModel.ExternalId = imdbId;
+                addMediaObjectViewModel.DatabaseSource = 1; //1 = IMDB
+
+                addMediaObjectViewModel.SubTypeID = context.SubTypes.Where(t => t.Name == type).Single().ID;
+            }
 
             return View(addMediaObjectViewModel);
         }
@@ -64,7 +80,8 @@ namespace BacklogManager.Controllers
                     Started = addMediaObjectViewModel.Started,
                     DateAdded = DateTime.Now, //.ToString("yyyy-MM-dd"), //preferred format
                     RecommendSource = addMediaObjectViewModel.RecommendSource,
-                    OwnerId = userId
+                    OwnerId = userId,
+                    ExternalId = addMediaObjectViewModel.ExternalId
                 };
 
                 context.MediaObjects.Add(newMediaObject);
@@ -179,6 +196,24 @@ namespace BacklogManager.Controllers
 
             return Redirect("/");
         }
+        
+        //ToDo: Add Search action
+        //ToDo: Modify layout Add link
+        public IActionResult Search()
+        {
+            List<OMDbTitle> omdbTitles = new List<OMDbTitle>();
+
+            return View(omdbTitles);
+        }
+
+        [HttpPost]
+        public IActionResult Search(List<OMDbTitle> omdbTitles)
+        {
+            return View(omdbTitles);
+        }
+
+
+        //Methods
 
         public List<MediaObject> ArrayIdsToListMediaObjects(int[] arrayIds)
         {
@@ -222,7 +257,7 @@ namespace BacklogManager.Controllers
             else if (binaryValue == 1) { boolean = true; }
             else
             {
-                //throw exception
+                //ToDo: write exception logic
             }
 
             return boolean;
