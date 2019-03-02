@@ -28,6 +28,7 @@ namespace BacklogManager.Models
         //public DateTime TimeAdded { get; set; }
         public string RecommendSource { get; set; }
         public string OwnerId { get; set; }
+        public string ExternalId { get; set; }
 
         public MediaObject() { }
     }
