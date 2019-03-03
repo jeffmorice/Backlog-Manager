@@ -93,6 +93,24 @@ namespace BacklogManager.Controllers
             //Deserializing the response received from web api and storing in the OMDbTitle list
             omdbTitles = JsonConvert.DeserializeObject<List<OMDbTitle>>(responseString);
 
+            if (omdbTitles.Count > 1)
+            {
+                List<OMDbTitle> listCopy = new List<OMDbTitle>(omdbTitles);
+
+                //remove doubles
+                foreach (OMDbTitle omdbTitle in omdbTitles)
+                {
+                    List<OMDbTitle> listMatches = listCopy.FindAll(i => i.ImdbId == omdbTitle.ImdbId);
+
+                    if (listMatches.Count > 1)
+                    {
+                        listCopy.Remove(omdbTitle);
+                    }
+                }
+
+                omdbTitles = listCopy;
+            }
+
             return omdbTitles;
         }
     }
