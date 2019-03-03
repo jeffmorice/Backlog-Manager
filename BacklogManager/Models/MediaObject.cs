@@ -29,6 +29,8 @@ namespace BacklogManager.Models
         public string RecommendSource { get; set; }
         public string OwnerId { get; set; }
         public string ExternalId { get; set; }
+        public int SuggestedCount { get; set; }
+        public int SelectedCount { get; set; }
 
         public MediaObject() { }
     }
