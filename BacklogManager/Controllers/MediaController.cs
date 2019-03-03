@@ -235,8 +235,11 @@ namespace BacklogManager.Controllers
                 if (randomMedia.Contains(mediaObjects[index]) == false)
                 {
                     randomMedia.Add(mediaObjects[index]);
+                    mediaObjects[index].SuggestedCount += 1;
                 }
             }
+
+            context.SaveChanges();
 
             //pass objects to view
             return View(randomMedia);
