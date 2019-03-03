@@ -212,6 +212,36 @@ namespace BacklogManager.Controllers
             return View(omdbTitles);
         }
 
+        public IActionResult RandomSuggestion()
+        {
+            string userId = Common.ExtensionMethods.getUserId(this.User);
+
+            //query database for all undeleted, uncompleted results belonging to the user.
+            List<MediaObject> mediaObjects = context.MediaObjects.
+                Where(u => u.OwnerId == userId).
+                Where(d => d.Deleted == false).
+                Where(c => c.Completed == false).
+                ToList();
+            List<MediaObject> randomMedia = new List<MediaObject>();
+            int numSuggestion = 3;
+
+            //write logic to get random object by index and add to list
+            //for (int i = 0; i < numSuggestion; i++)
+            while(randomMedia.Count < numSuggestion)
+            {
+                Random rand = new Random();
+                int index = rand.Next(0, mediaObjects.Count);
+
+                if (randomMedia.Contains(mediaObjects[index]) == false)
+                {
+                    randomMedia.Add(mediaObjects[index]);
+                }
+            }
+
+            //pass objects to view
+            return View(randomMedia);
+        }
+
 
         //Methods
 
