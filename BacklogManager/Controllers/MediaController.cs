@@ -81,7 +81,8 @@ namespace BacklogManager.Controllers
                     DateAdded = DateTime.Now, //.ToString("yyyy-MM-dd"), //preferred format
                     RecommendSource = addMediaObjectViewModel.RecommendSource,
                     OwnerId = userId,
-                    ExternalId = addMediaObjectViewModel.ExternalId
+                    ExternalId = addMediaObjectViewModel.ExternalId,
+                    Interest = addMediaObjectViewModel.Interest
                 };
 
                 context.MediaObjects.Add(newMediaObject);
@@ -142,12 +143,7 @@ namespace BacklogManager.Controllers
                 List<bool> startedBools = StripAndConvertIntArrayToListBool(updateMediaObjectViewModel.StartedValues);
                 //completed
                 List<bool> completedBools = StripAndConvertIntArrayToListBool(updateMediaObjectViewModel.CompletedValues);
-
-                //convert binary values to bools
-                //started
-                //completed
-
-
+                
                 foreach (int ID in updateMediaObjectViewModel.MediaIDs)
                 {
                     //find media object in database
@@ -172,6 +168,17 @@ namespace BacklogManager.Controllers
                             //then update
                             updateCandidate.Completed = completedBools[i];
                             countUpdate = true;
+                        }
+                        //check if Interest value has changed
+                        if (updateCandidate.Interest != updateMediaObjectViewModel.Interest[i])
+                        {
+                            //check if value is in range
+                            if (1 <= updateMediaObjectViewModel.Interest[i] & updateMediaObjectViewModel.Interest[i] <= 10)
+                            {
+                                //then update
+                                updateCandidate.Interest = updateMediaObjectViewModel.Interest[i];
+                                countUpdate = true;
+                            }
                         }
                         if (countUpdate)
                         {

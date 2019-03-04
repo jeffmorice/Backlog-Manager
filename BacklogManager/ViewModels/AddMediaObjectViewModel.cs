@@ -23,7 +23,10 @@ namespace BacklogManager.ViewModels
         [Display(Name = "How did you hear about it? Who recommended it to you?")]
         public string RecommendSource { get; set; }
         public string ExternalId { get; set; }
+        [Range(1, 10)]
+        public int Interest { get; set; }
 
+        //ToDo: fix bug where select list is destroyed after invalid submission
         public List<SelectListItem> SubTypes { get; set; }
 
         public AddMediaObjectViewModel() { }

@@ -16,6 +16,7 @@
                     <th>Title</th>
                     <th>Media Type</th>
                     <th>Source</th>
+                    <th>Interest (1-10)</th>
                     <th>Started</th>
                     <th>Completed</th>
                     <th>Delete</th>
@@ -30,6 +31,9 @@
                         <td>@mediaObject.MediaSubType.Name</td>
                         <td>
                             @mediaObject.RecommendSource
+                        </td>
+                        <td>
+                            <input type="number" name="interest" id="@mediaObject.ID" value="@mediaObject.Interest"/>
                         </td>
                         <td>
                             <input type="hidden" name="startedValues" id="@mediaObject.ID" value="0" />

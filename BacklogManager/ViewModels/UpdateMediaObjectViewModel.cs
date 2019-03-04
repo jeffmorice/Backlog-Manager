@@ -13,6 +13,8 @@ namespace BacklogManager.ViewModels
         public int[] StartedValues { get; set; }
         public int[] CompletedValues { get; set; }
         public int[] DeletedIDs { get; set; }
+        //[Range(1, 10)]
+        public int[] Interest { get; set; }
 
         public UpdateMediaObjectViewModel() { }
     }
