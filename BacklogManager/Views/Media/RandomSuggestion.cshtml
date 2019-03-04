@@ -23,6 +23,12 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
+            <td>
+                <form method="post" asp-controller="Media" asp-action="SelectTitle">
+                    <input type="hidden" name="ID" value="@item.ID" />
+                    <input type="submit" value="Select" /> 
+                </form>
+            </td>
         </tr>
 }
     </tbody>

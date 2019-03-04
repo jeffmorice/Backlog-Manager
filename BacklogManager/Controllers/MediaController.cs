@@ -245,6 +245,17 @@ namespace BacklogManager.Controllers
             return View(randomMedia);
         }
 
+        public IActionResult SelectTitle(int ID)
+        {
+            //increment SelectedCount
+            MediaObject selected = context.MediaObjects.Where(i => i.ID == ID).Single();
+            selected.SelectedCount += 1;
+            context.SaveChanges();
+
+            //ToDo: add title details page
+            //ToDo: redirect to details page matching given ID after selection
+            return Redirect("/Media/Index");
+        }
 
         //Methods
 
