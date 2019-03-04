@@ -31,6 +31,8 @@ namespace BacklogManager.Models
         public string ExternalId { get; set; }
         public int SuggestedCount { get; set; }
         public int SelectedCount { get; set; }
+        [Range(1,10)]
+        public int Interest { get; set; } = 10;
 
         public MediaObject() { }
     }
