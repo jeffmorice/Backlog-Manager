@@ -25,6 +25,10 @@ namespace BacklogManager.Controllers
             context = dbContext;
         }
 
+        //Debug controls
+        bool testSuggestions = false;
+        int numTest = 10000;
+
         //Actions
 
         public IActionResult Index()
@@ -49,7 +53,6 @@ namespace BacklogManager.Controllers
 
             AddMediaObjectViewModel addMediaObjectViewModel = new AddMediaObjectViewModel(context.SubTypes.ToList());
 
-            //If I can't pass a whole object as a parameter here, I can send a request to the api, but that's a crappy solution.
             if (imdbId != null & title != null)
             {
                 addMediaObjectViewModel.Title = title;
@@ -189,8 +192,7 @@ namespace BacklogManager.Controllers
                     i++;
                 }
             }
-
-            //Save changes
+            
             context.SaveChanges();
 
             //Then check for deleted Ids and pass any to the DeletePrompt route
@@ -204,8 +206,6 @@ namespace BacklogManager.Controllers
             return Redirect("/");
         }
         
-        //ToDo: Add Search action
-        //ToDo: Modify layout Add link
         public IActionResult Search()
         {
             List<OMDbTitle> omdbTitles = new List<OMDbTitle>();
@@ -231,9 +231,7 @@ namespace BacklogManager.Controllers
                 ToList();
             List<MediaObject> randomMedia = new List<MediaObject>();
             int numSuggestion = 3;
-
-            //write logic to get random object by index and add to list
-            //for (int i = 0; i < numSuggestion; i++)
+            
             while(randomMedia.Count < numSuggestion)
             {
                 Random rand = new Random();
@@ -247,9 +245,97 @@ namespace BacklogManager.Controllers
             }
 
             context.SaveChanges();
-
-            //pass objects to view
+            
             return View(randomMedia);
+        }
+
+        public IActionResult WeightedSuggestion()
+        {
+            string userId = Common.ExtensionMethods.getUserId(this.User);
+
+            //query database for all undeleted, uncompleted results belonging to the user.
+            List<MediaObject> mediaObjects = context.MediaObjects.
+                Where(u => u.OwnerId == userId).
+                Where(d => d.Deleted == false).
+                Where(c => c.Completed == false).
+                ToList();
+            List<MediaObject> weightedRandomMedia = new List<MediaObject>();
+            int numSuggestion = 3;
+            bool ignoreDoubles = true;
+
+            //debug Suggestions
+            if (testSuggestions == true)
+            {
+                ResetSuggestedCount(mediaObjects);
+                //numSuggestion = numTest;
+                //ignoreDoubles = false;
+            }
+
+            int numTests = 0;
+            //loop for debugging
+            for (int i = 0; i < numTest; i++)
+            {
+                while (weightedRandomMedia.Count < numSuggestion)
+                {
+                    Random rand = new Random();
+                    int index = rand.Next(0, mediaObjects.Count);
+                    MediaObject theMedia = mediaObjects[index];
+
+                    //ignore doubles
+                    if (weightedRandomMedia.Contains(theMedia) == false || ignoreDoubles == false)
+                    {
+                        int interestMax = 10;
+                        int updateThreshold = 3;  //caps influence of UpdateCount (measurement of engagement)
+
+                        //compute probability range
+                        int baseRange = interestMax + updateThreshold;
+                        int updateFactor = theMedia.UpdateCount;
+                        int suggestedFactor = theMedia.SuggestedCount / numSuggestion;
+
+                        if (testSuggestions == true) { suggestedFactor = theMedia.SuggestedCount / 3; }
+
+                        //control for maximum suggestedFactor
+                        if (suggestedFactor > interestMax) { suggestedFactor = interestMax; }
+
+                        //control for maximum updateFactor
+                        if (updateFactor > updateThreshold) { updateFactor = updateThreshold; }
+
+                        int newRange = baseRange - updateFactor + suggestedFactor - theMedia.SelectedCount - theMedia.Interest;
+
+                        //if newRange is <= 1, there is a 100% probability it will be chosen
+                        if (newRange <= 1)
+                        {
+                            weightedRandomMedia.Add(theMedia);
+                            theMedia.SuggestedCount += 1;
+                        }
+                        else
+                        {
+                            //run random with new range
+                            Random prob = new Random();
+                            int result = prob.Next(1, newRange + 1);
+
+                            //if result == 1, then add it to list
+                            if (result == 1)
+                            {
+                                weightedRandomMedia.Add(theMedia);
+                                theMedia.SuggestedCount += 1;
+                            }
+                        }
+                    }
+                }
+
+                //check if debug
+                if (testSuggestions == false) { break; }
+                else
+                {
+                    numTests += 1;
+                    weightedRandomMedia = new List<MediaObject>();
+                }
+            }
+
+            context.SaveChanges();
+
+            return View(weightedRandomMedia);
         }
 
         public IActionResult SelectTitle(int ID)
@@ -336,6 +422,18 @@ namespace BacklogManager.Controllers
             List<bool> boolValues = ListBinaryToListBool(strippedValues);
 
             return boolValues;
+        }
+
+        public void ResetSuggestedCount(List<MediaObject> mediaObjects)
+        {
+            foreach (MediaObject mediaObject in mediaObjects)
+            {
+                mediaObject.SuggestedCount = 0;
+
+                //Random rand = new Random();
+                //mediaObject.UpdateCount = rand.Next(0, 4);
+            }
+            context.SaveChanges();
         }
 
 

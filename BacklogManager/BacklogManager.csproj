@@ -21,5 +21,10 @@
     <Folder Include="Data\Migrations\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Update="Views\Media\WeightedSuggestion.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+  </ItemGroup>
 
 </Project>

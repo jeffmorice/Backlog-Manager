@@ -1,0 +1,35 @@
+﻿@model List<BacklogManager.Models.MediaObject>
+
+@{
+    ViewData["Title"] = "Random Suggestion";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Weighted Suggestion</h2>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Title
+            </th>
+            
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                <form method="post" asp-controller="Media" asp-action="SelectTitle">
+                    <input type="hidden" name="ID" value="@item.ID" />
+                    <input type="submit" value="Select" /> 
+                </form>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
