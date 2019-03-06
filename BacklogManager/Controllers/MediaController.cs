@@ -26,8 +26,8 @@ namespace BacklogManager.Controllers
         }
 
         //Debug controls
-        bool testSuggestions = false;
-        int numTest = 10000;
+        private bool testSuggestions = false;
+        private int numTest = 10000;
 
         //Actions
 
@@ -180,7 +180,8 @@ namespace BacklogManager.Controllers
                             {
                                 //then update
                                 updateCandidate.Interest = updateMediaObjectViewModel.Interest[i];
-                                countUpdate = true;
+                                //check if new value is > existing value, if not don't count the update
+                                if (updateMediaObjectViewModel.Interest[i] > updateCandidate.Interest) { countUpdate = true; }
                             }
                         }
                         if (countUpdate)
