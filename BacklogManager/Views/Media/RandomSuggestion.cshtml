@@ -7,29 +7,39 @@
 
 <h2>Random Suggestion</h2>
 
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Title
-            </th>
-            
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                <form method="post" asp-controller="Media" asp-action="SelectTitle">
-                    <input type="hidden" name="ID" value="@item.ID" />
-                    <input type="submit" value="Select" /> 
-                </form>
-            </td>
-        </tr>
+@if (Model.Count > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Title
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        <form method="post" asp-controller="Media" asp-action="SelectTitle">
+                            <input type="hidden" name="ID" value="@item.ID" />
+                            <input type="submit" value="Select" /> 
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
-    </tbody>
-</table>
+
+@* ToDo: update to accept a variable numSuggestion value. *@
+@if (Model.Count < 3)
+{
+    <br />
+    <br />
+    <p>That's all the suggestions we have today.</p>
+}

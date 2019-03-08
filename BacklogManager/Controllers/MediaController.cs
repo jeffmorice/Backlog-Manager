@@ -224,25 +224,42 @@ namespace BacklogManager.Controllers
         {
             string userId = Common.ExtensionMethods.getUserId(this.User);
 
-            //query database for all undeleted, uncompleted results belonging to the user.
+            //query database for all undeleted, uncompleted results belonging to the user not yet suggested today.
             List<MediaObject> mediaObjects = context.MediaObjects.
                 Where(u => u.OwnerId == userId).
                 Where(d => d.Deleted == false).
                 Where(c => c.Completed == false).
+                Where(l => int.Parse(l.LastSuggested.ToString("yyyyMMdd")) < int.Parse(DateTime.Now.ToString("yyyyMMdd"))).
                 ToList();
             List<MediaObject> randomMedia = new List<MediaObject>();
             int numSuggestion = 3;
             
-            while(randomMedia.Count < numSuggestion)
+            //ensure the while loop does not continue needlessly when too few items in list
+            if (mediaObjects.Count <= numSuggestion)
             {
-                Random rand = new Random();
-                int index = rand.Next(0, mediaObjects.Count);
-                MediaObject theMedia = mediaObjects[index];
-
-                if (randomMedia.Contains(theMedia) == false)
+                foreach (MediaObject mediaObject in mediaObjects)
                 {
-                    randomMedia.Add(theMedia);
-                    theMedia.SuggestedCount += 1;
+                    mediaObject.SuggestedCount += 1;
+                    mediaObject.LastSuggested = DateTime.Now;
+                }
+                context.SaveChanges();
+                
+                return View(mediaObjects);
+            }
+            else
+            {
+                while (randomMedia.Count < numSuggestion)
+                {
+                    Random rand = new Random();
+                    int index = rand.Next(0, mediaObjects.Count);
+                    MediaObject theMedia = mediaObjects[index];
+
+                    if (randomMedia.Contains(theMedia) == false)
+                    {
+                        randomMedia.Add(theMedia);
+                        theMedia.SuggestedCount += 1;
+                        theMedia.LastSuggested = DateTime.Now;
+                    }
                 }
             }
 
@@ -255,11 +272,12 @@ namespace BacklogManager.Controllers
         {
             string userId = Common.ExtensionMethods.getUserId(this.User);
 
-            //query database for all undeleted, uncompleted results belonging to the user.
+            //query database for all undeleted, uncompleted results belonging to the user not yet suggested today.
             List<MediaObject> mediaObjects = context.MediaObjects.
                 Where(u => u.OwnerId == userId).
                 Where(d => d.Deleted == false).
                 Where(c => c.Completed == false).
+                Where(l => int.Parse(l.LastSuggested.ToString("yyyyMMdd")) < int.Parse(DateTime.Now.ToString("yyyyMMdd"))).
                 ToList();
             List<MediaObject> weightedRandomMedia = new List<MediaObject>();
             int numSuggestion = 3;
@@ -277,50 +295,67 @@ namespace BacklogManager.Controllers
             //loop for debugging
             for (int i = 0; i < numTest; i++)
             {
-                while (weightedRandomMedia.Count < numSuggestion)
+                //ensure the while loop does not continue needlessly when too few items in list
+                if (mediaObjects.Count <= numSuggestion)
                 {
-                    Random rand = new Random();
-                    int index = rand.Next(0, mediaObjects.Count);
-                    MediaObject theMedia = mediaObjects[index];
-
-                    //ignore doubles
-                    if (weightedRandomMedia.Contains(theMedia) == false || ignoreDoubles == false)
+                    foreach (MediaObject mediaObject in mediaObjects)
                     {
-                        int interestMax = 10;
-                        int updateThreshold = 3;  //caps influence of UpdateCount (measurement of engagement)
+                        mediaObject.SuggestedCount += 1;
+                        mediaObject.LastSuggested = DateTime.Now;
+                    }
+                    context.SaveChanges();
 
-                        //compute probability range
-                        int baseRange = interestMax + updateThreshold;
-                        int updateFactor = theMedia.UpdateCount;
-                        int suggestedFactor = theMedia.SuggestedCount / numSuggestion;
+                    return View(mediaObjects);
+                }
+                else
+                {
+                    while (weightedRandomMedia.Count < numSuggestion)
+                    {
+                        Random rand = new Random();
+                        int index = rand.Next(0, mediaObjects.Count);
+                        MediaObject theMedia = mediaObjects[index];
 
-                        if (testSuggestions == true) { suggestedFactor = theMedia.SuggestedCount / 3; }
-
-                        //control for maximum suggestedFactor
-                        if (suggestedFactor > interestMax) { suggestedFactor = interestMax; }
-
-                        //control for maximum updateFactor
-                        if (updateFactor > updateThreshold) { updateFactor = updateThreshold; }
-
-                        int newRange = baseRange - updateFactor + suggestedFactor - theMedia.SelectedCount - theMedia.Interest;
-
-                        //if newRange is <= 1, there is a 100% probability it will be chosen
-                        if (newRange <= 1)
+                        //ignore doubles
+                        if (weightedRandomMedia.Contains(theMedia) == false || ignoreDoubles == false)
                         {
-                            weightedRandomMedia.Add(theMedia);
-                            theMedia.SuggestedCount += 1;
-                        }
-                        else
-                        {
-                            //run random with new range
-                            Random prob = new Random();
-                            int result = prob.Next(1, newRange + 1);
+                            int interestMax = 10;
+                            int updateThreshold = 3;  //caps influence of UpdateCount (measurement of engagement)
 
-                            //if result == 1, then add it to list
-                            if (result == 1)
+                            //compute probability range
+                            int baseRange = interestMax + updateThreshold;
+                            int updateFactor = theMedia.UpdateCount;
+                            int suggestedFactor = theMedia.SuggestedCount / numSuggestion;
+
+                            if (testSuggestions == true) { suggestedFactor = theMedia.SuggestedCount / 3; }
+
+                            //control for maximum suggestedFactor
+                            if (suggestedFactor > interestMax) { suggestedFactor = interestMax; }
+
+                            //control for maximum updateFactor
+                            if (updateFactor > updateThreshold) { updateFactor = updateThreshold; }
+
+                            int newRange = baseRange - updateFactor + suggestedFactor - theMedia.SelectedCount - theMedia.Interest;
+
+                            //if newRange is <= 1, there is a 100% probability it will be chosen
+                            if (newRange <= 1)
                             {
                                 weightedRandomMedia.Add(theMedia);
                                 theMedia.SuggestedCount += 1;
+                                theMedia.LastSuggested = DateTime.Now;
+                            }
+                            else
+                            {
+                                //run random with new range
+                                Random prob = new Random();
+                                int result = prob.Next(1, newRange + 1);
+
+                                //if result == 1, then add it to list
+                                if (result == 1)
+                                {
+                                    weightedRandomMedia.Add(theMedia);
+                                    theMedia.SuggestedCount += 1;
+                                    theMedia.LastSuggested = DateTime.Now;
+                                }
                             }
                         }
                     }
@@ -426,7 +461,7 @@ namespace BacklogManager.Controllers
             return boolValues;
         }
 
-        public void ResetSuggestedCount(List<MediaObject> mediaObjects)
+        private void ResetSuggestedCount(List<MediaObject> mediaObjects)
         {
             foreach (MediaObject mediaObject in mediaObjects)
             {
@@ -436,6 +471,27 @@ namespace BacklogManager.Controllers
                 //mediaObject.UpdateCount = rand.Next(0, 4);
             }
             context.SaveChanges();
+        }
+
+        //Admin Debug actions
+
+        public IActionResult ResetSuggestions()
+        {
+            string userId = Common.ExtensionMethods.getUserId(this.User);
+
+            List<MediaObject> mediaObjects = context.MediaObjects.
+                Where(u => u.OwnerId == userId).
+                ToList();
+
+            foreach (MediaObject mediaObject in mediaObjects)
+            {
+                mediaObject.SuggestedCount = 0;
+                mediaObject.LastSuggested = new DateTime(0001, 01, 01);
+            }
+
+            context.SaveChanges();
+
+            return Redirect("/Media/Index");
         }
 
 
