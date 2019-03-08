@@ -33,6 +33,8 @@ namespace BacklogManager.Models
         public int SelectedCount { get; set; }
         [Range(1,10)]
         public int Interest { get; set; } = 10;
+        [Column(TypeName = "date")]
+        public DateTime LastSuggested { get; set; }
 
         public MediaObject() { }
     }
