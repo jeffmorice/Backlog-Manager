@@ -237,11 +237,12 @@ namespace BacklogManager.Controllers
             {
                 Random rand = new Random();
                 int index = rand.Next(0, mediaObjects.Count);
+                MediaObject theMedia = mediaObjects[index];
 
-                if (randomMedia.Contains(mediaObjects[index]) == false)
+                if (randomMedia.Contains(theMedia) == false)
                 {
-                    randomMedia.Add(mediaObjects[index]);
-                    mediaObjects[index].SuggestedCount += 1;
+                    randomMedia.Add(theMedia);
+                    theMedia.SuggestedCount += 1;
                 }
             }
 
