@@ -31,21 +31,49 @@ namespace BacklogManager.Controllers
 
         //Actions
 
-        public IActionResult Index()
+        public IActionResult Index(int subTypeId)
         {
             string userId = Common.ExtensionMethods.getUserId(this.User);
 
-             if (userId == null)
+            if (userId == null)
             {
                 return Redirect("/Home/Index");
             }
 
+            List<MediaBySubTypeViewModel> mediaBySubTypeViewModels = new List<MediaBySubTypeViewModel>();
+            List<SubType> subTypes = new List<SubType>();
+
+            if (subTypeId != 0)
+            {
+                subTypes = context.SubTypes.Where(s => s.ID == subTypeId).ToList();
+            }
+            else
+            {
+                subTypes = context.SubTypes.ToList();
+            }
+
+            foreach (SubType subType in subTypes)
+            {
+                MediaBySubTypeViewModel mediaBySubTypeViewModel = new MediaBySubTypeViewModel
+                {
+                    MediaSubType = subType,
+                    MediaObjects = context.MediaObjects.
+                    Include(s => s.MediaSubType).
+                    Where(u => u.OwnerId == userId).
+                    Where(d => d.Deleted == false).
+                    Where(sti => sti.SubTypeID == subType.ID).
+                    ToList()
+                };
+
+                if (mediaBySubTypeViewModel.MediaObjects.Count() != 0)
+                {
+                    mediaBySubTypeViewModels.Add(mediaBySubTypeViewModel);
+                } 
+            }
+
             MediaIndexViewModel mediaIndexViewModel = new MediaIndexViewModel
             {
-                MediaObjects = context.MediaObjects.
-                Include(s => s.MediaSubType).
-                Where(u => u.OwnerId == userId).
-                Where(d => d.Deleted == false).ToList(),
+                MediaBySubTypeViewModels = mediaBySubTypeViewModels,
                 UpdateMediaObjectViewModel = new UpdateMediaObjectViewModel()
             };
 
