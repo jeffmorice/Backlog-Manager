@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace BacklogManager.ViewModels
 {
-    public class MediaIndexViewModel
+    public class SuggestionViewModel
     {
         public IList<MediaObject> MediaObjects { get; set; }
-        public UpdateMediaObjectViewModel UpdateMediaObjectViewModel { get; set; }
+
+        public SuggestionViewModel() { }
     }
 }

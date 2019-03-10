@@ -1,4 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+
+
+    <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -26,15 +33,18 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">BacklogManager</a>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Backlog Manager</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Media" asp-action="Index">Media List</a></li>
-                    <li><a asp-area="" asp-controller="Media" asp-action="Search">Add Media</a></li>
-                    <li><a asp-area="" asp-controller="Media" asp-action="RandomSuggestion">Random</a></li>
-                    <li><a asp-area="" asp-controller="Media" asp-action="WeightedSuggestion">Weighted</a></li>
-                    <li><a asp-area="" asp-controller="SubType" asp-action="Index">Media Sub-Types</a></li>
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <li><a asp-area="" asp-controller="Media" asp-action="Index">Backlog</a></li>
+                        <li><a asp-area="" asp-controller="Media" asp-action="Search">Add</a></li>
+                        <li><a asp-area="" asp-controller="Media" asp-action="RandomSuggestion">Random</a></li>
+                        <li><a asp-area="" asp-controller="Media" asp-action="WeightedSuggestion">Weighted</a></li>
+                        <li><a asp-area="" asp-controller="SubType" asp-action="Index">Media Sub-Types</a></li>
+                    }
                 </ul>
                 <partial name="_LoginPartial" />
             </div>

@@ -4,7 +4,7 @@
     ViewData["Title"] = "Add Media";
 }
 
-<h4>Add Media</h4>
+<h1>Add Media</h1>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -20,11 +20,6 @@
                 <br />
                 <select asp-for="SubTypeID" asp-items="Model.SubTypes"></select>
                 <span asp-validation-for="SubTypeID" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DatabaseSource" class="control-label"></label>
-                <input asp-for="DatabaseSource" class="form-control" />
-                <span asp-validation-for="DatabaseSource" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Interest" class="control-label"></label>
@@ -43,6 +38,7 @@
             </div>
             <div class="form-group">
                 <input type="hidden" asp-for="ExternalId" />
+                <input type="hidden" asp-for="DatabaseSource" />
                 <input type="submit" value="Add" class="btn btn-default" />
             </div>
         </form>

@@ -5,11 +5,14 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Search</h2>
+<h1>Search</h1>
+<p>
+    To add a <strong>Movie</strong>, <strong>TV series</strong> or <strong>episode</strong>,
+    <br />
+    search IMDB for your title here:
+</p>
 
-@* If searching for a movie, TV series, or TV episode, enter a search term *@
 <div>
-    <p>To add a Movie, TV series or episode, search for your title here.</p>
     <form method="get" asp-controller="OMDb" asp-action="Index">
         <table class="table">
             <tr>

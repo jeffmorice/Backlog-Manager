@@ -6,50 +6,58 @@
     ViewData["Title"] = "Media";
 }
 
-<h2>Media</h2>
-@if (Model.MediaOjects.Count != 0)
-    {
-        <form method="post" asp-action="Update">
-            <input type="submit" value="Save Changes" />
-            <table class="table">
+<h1>My Backlog</h1>
+<p>
+    Find all titles in your Backlog listed here.
+</p>
+
+<input type="submit" form="updateForm" value="Save Changes" />
+<br />
+<br />
+
+@if (Model.MediaObjects.Count != 0)
+{
+    <form method="post" id="updateForm" asp-action="Update">
+
+        <table class="table">
+            <tr>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Source</th>
+                <th>Interest (1-10)</th>
+                <th>Started</th>
+                <th>Completed</th>
+                <th>Delete</th>
+            </tr>
+            @foreach (MediaObject mediaObject in Model.MediaObjects)
+            {
                 <tr>
-                    <th>Title</th>
-                    <th>Media Type</th>
-                    <th>Source</th>
-                    <th>Interest (1-10)</th>
-                    <th>Started</th>
-                    <th>Completed</th>
-                    <th>Delete</th>
+                    <td>
+                        @mediaObject.Title
+                        <input type="hidden" name="mediaIds" id="@mediaObject.ID" value="@mediaObject.ID" />
+                    </td>
+                    <td>@mediaObject.MediaSubType.Name</td>
+                    <td>
+                        @mediaObject.RecommendSource
+                    </td>
+                    <td>
+                        <input type="number" name="interest" id="@mediaObject.ID" value="@mediaObject.Interest" />
+                    </td>
+                    <td>
+                        <input type="hidden" name="startedValues" id="@mediaObject.ID" value="0" />
+                        <input type="checkbox" name="startedValues" id="@mediaObject.ID" value="1" checked="@mediaObject.Started" />
+                    </td>
+                    <td>
+                        <input type="hidden" name="completedValues" id="@mediaObject.ID" value="0" />
+                        <input type="checkbox" name="completedValues" id="@mediaObject.ID" value="1" checked="@mediaObject.Completed" />
+                    </td>
+                    <td><input type="checkbox" name="deletedIds" id="@mediaObject.ID" value="@mediaObject.ID" /></td>
                 </tr>
-                @foreach (MediaObject mediaObject in Model.MediaOjects)
-                {
-                    <tr>
-                        <td>
-                            @mediaObject.Title
-                            <input type="hidden" name="mediaIds" id="@mediaObject.ID" value="@mediaObject.ID" />
-                        </td>
-                        <td>@mediaObject.MediaSubType.Name</td>
-                        <td>
-                            @mediaObject.RecommendSource
-                        </td>
-                        <td>
-                            <input type="number" name="interest" id="@mediaObject.ID" value="@mediaObject.Interest"/>
-                        </td>
-                        <td>
-                            <input type="hidden" name="startedValues" id="@mediaObject.ID" value="0" />
-                            <input type="checkbox" name="startedValues" id="@mediaObject.ID" value="1" checked="@mediaObject.Started" />
-                        </td>
-                        <td>
-                            <input type="hidden" name="completedValues" id="@mediaObject.ID" value="0" />
-                            <input type="checkbox" name="completedValues" id="@mediaObject.ID" value="1" checked="@mediaObject.Completed" />
-                        </td>
-                        <td><input type="checkbox" name="deletedIds" id="@mediaObject.ID" value="@mediaObject.ID" /></td>
-                    </tr>
-                }
-            </table>
-        </form>
-    }
+            }
+        </table>
+    </form>
+}
 else
-    { 
-        <p>No Media in list, <a asp-action="Search">Add some</a>.</p>
-    }
+{
+    <p>No Media in list, <a asp-action="Search">Add some</a>.</p>
+}

@@ -35,9 +35,14 @@ namespace BacklogManager.Controllers
         {
             string userId = Common.ExtensionMethods.getUserId(this.User);
 
+             if (userId == null)
+            {
+                return Redirect("/Home/Index");
+            }
+
             MediaIndexViewModel mediaIndexViewModel = new MediaIndexViewModel
             {
-                MediaOjects = context.MediaObjects.
+                MediaObjects = context.MediaObjects.
                 Include(s => s.MediaSubType).
                 Where(u => u.OwnerId == userId).
                 Where(d => d.Deleted == false).ToList(),
@@ -226,12 +231,14 @@ namespace BacklogManager.Controllers
 
             //query database for all undeleted, uncompleted results belonging to the user not yet suggested today.
             List<MediaObject> mediaObjects = context.MediaObjects.
+                Include(s => s.MediaSubType).
                 Where(u => u.OwnerId == userId).
                 Where(d => d.Deleted == false).
                 Where(c => c.Completed == false).
                 Where(l => int.Parse(l.LastSuggested.ToString("yyyyMMdd")) < int.Parse(DateTime.Now.ToString("yyyyMMdd"))).
                 ToList();
             List<MediaObject> randomMedia = new List<MediaObject>();
+            //SuggestionViewModel suggestionViewModel = new SuggestionViewModel(context.SubTypes.ToList());
             int numSuggestion = 3;
             
             //ensure the while loop does not continue needlessly when too few items in list
@@ -243,8 +250,10 @@ namespace BacklogManager.Controllers
                     mediaObject.LastSuggested = DateTime.Now;
                 }
                 context.SaveChanges();
-                
-                return View(mediaObjects);
+
+                SuggestionViewModel suggestionViewModelB = new SuggestionViewModel { MediaObjects = mediaObjects };
+
+                return View(suggestionViewModelB);
             }
             else
             {
@@ -264,8 +273,10 @@ namespace BacklogManager.Controllers
             }
 
             context.SaveChanges();
-            
-            return View(randomMedia);
+
+            SuggestionViewModel suggestionViewModelA = new SuggestionViewModel { MediaObjects = randomMedia };
+
+            return View(suggestionViewModelA);
         }
 
         public IActionResult WeightedSuggestion()
@@ -274,6 +285,7 @@ namespace BacklogManager.Controllers
 
             //query database for all undeleted, uncompleted results belonging to the user not yet suggested today.
             List<MediaObject> mediaObjects = context.MediaObjects.
+                Include(s => s.MediaSubType).
                 Where(u => u.OwnerId == userId).
                 Where(d => d.Deleted == false).
                 Where(c => c.Completed == false).
@@ -305,7 +317,9 @@ namespace BacklogManager.Controllers
                     }
                     context.SaveChanges();
 
-                    return View(mediaObjects);
+                    SuggestionViewModel suggestionViewModelB = new SuggestionViewModel { MediaObjects = mediaObjects };
+
+                    return View(suggestionViewModelB);
                 }
                 else
                 {
@@ -372,7 +386,9 @@ namespace BacklogManager.Controllers
 
             context.SaveChanges();
 
-            return View(weightedRandomMedia);
+            SuggestionViewModel suggestionViewModelA = new SuggestionViewModel { MediaObjects = weightedRandomMedia };
+
+            return View(suggestionViewModelA);
         }
 
         public IActionResult SelectTitle(int ID)
