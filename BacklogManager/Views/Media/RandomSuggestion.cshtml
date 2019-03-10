@@ -9,31 +9,39 @@
 <p>
     A purely random suggestion from your Backlog, for when you aren't feeling picky.
 </p>
-<hr />
 
 @if (Model.MediaObjects.Count > 0)
 {
     <table class="table">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Type</th>
-            </tr>
-        </thead>
         <tbody>
-            @foreach (MediaObject mediaObject in Model.MediaObjects)
-            {
-                <tr>
+            <tr>
+                @* Poster row *@
+                @foreach (MediaObject mediaObject in Model.MediaObjects)
+                {
+                    @if (mediaObject.Image != "N/A" & mediaObject.Image != null)
+                    {
+                        <td><a asp-controller="Media" asp-action="SelectTitle" asp-route-ID="@mediaObject.ID"><img src="@mediaObject.Image" height="384" /></a></td>
+                    }
+                    else
+                    {
+                        <td><a asp-controller="Media" asp-action="SelectTitle" asp-route-ID="@mediaObject.ID"><img src="https://i.ibb.co/mBByDjW/No-Image-Placeholder.png" height="384" /></a></td>
+                    }
+                }
+            </tr>
+            <tr>
+                @* Title row *@
+                @foreach (MediaObject mediaObject in Model.MediaObjects)
+                {
                     <td>@mediaObject.Title</td>
+                }
+            </tr>
+            <tr>
+                @* Type row *@
+                @foreach (MediaObject mediaObject in Model.MediaObjects)
+                {
                     <td>@mediaObject.MediaSubType.Name</td>
-                    <td>
-                        <form method="post" asp-controller="Media" asp-action="SelectTitle">
-                            <input type="hidden" name="ID" value="@mediaObject.ID" />
-                            <input type="submit" value="Select" />
-                        </form>
-                    </td>
-                </tr>
-            }
+                }
+            </tr>
         </tbody>
     </table>
 }
