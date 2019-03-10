@@ -13,30 +13,28 @@
 </p>
 
 <div>
-    <form method="get" asp-controller="OMDb" asp-action="Index">
-        <table class="table">
-            <tr>
-                <th><label>Title</label></th>
-                <th><label>Year</label></th>
-                <th><label>Type</label></th>
-            </tr>
-            <tr>
-                <td><input type="text" name="title" /></td>
-                <td><input type="number" name="year" /></td>
-                <td>
-                    <select name="type" id="type">
-                        <option value="null">------</option>
-                        <option value="movie">Movie</option>
-                        <option value="series">Series</option>
-                        <option value="episode">Episode</option>
-                    </select>
-                </td>
-                <td><input type="hidden" name="search" value="true"/><input type="submit" value="Search" class="btn btn-default" /></td>
-            </tr>
-            
-        </table>
-    </form>
+    <form method="get" asp-controller="OMDb" asp-action="Index" id="omdbSearch"></form>
     <table class="table">
+        <tr>
+            <th></th>
+            <th><label>Title</label></th>
+            <th><label>Year</label></th>
+            <th><label>Type</label></th>
+        </tr>
+        <tr>
+            <td></td>
+            <td><input type="text" name="title" form="omdbSearch" /></td>
+            <td><input type="number" name="year" form="omdbSearch" /></td>
+            <td>
+                <select name="type" id="type" form="omdbSearch">
+                    <option value="null">------</option>
+                    <option value="movie">Movie</option>
+                    <option value="series">Series</option>
+                    <option value="episode">Episode</option>
+                </select>
+            </td>
+            <td><input type="hidden" name="search" value="true" form="omdbSearch" /><input type="submit" value="Search" class="btn btn-default" form="omdbSearch" /></td>
+        </tr>
         @* If model != null, display search results *@
         @if (Model.Count != 0)
         {
@@ -45,6 +43,14 @@
                 @foreach (OMDbTitle title in Model)
                 {
                     <tr>
+                        @if (title.Poster != "N/A")
+                        {
+                            <td><img src="@title.Poster" height="128" /></td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
                         <td>
                             <a href="https://www.imdb.com/title/@title.ImdbId" >@title.Title</a>
                         </td>
@@ -55,7 +61,8 @@
                                 <input type="hidden" name="imdbId" value="@title.ImdbId" />
                                 <input type="hidden" name="title" value="@title.Title"/>
                                 <input type="hidden" name="type" value="@title.Type" />
-                                <input type="submit" value="Add" />
+                                <input type="hidden" name="image" value="@title.Poster" />
+                                <input type="submit" value="Add" class="btn btn-default" />
                             </form>
                         </td>
                     </tr>
