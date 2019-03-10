@@ -26,6 +26,7 @@ namespace BacklogManager.ViewModels
         [Range(1, 10, ErrorMessage = "Please enter an integer from 1-10.")]
         [Display(Name = "Rate your interest from 1 to 10 (from 'If I ever get around to it' to 'I literally can't wait').")]
         public int Interest { get; set; } = 10;    //10 is the default value, here and for the creation of media objects
+        public string Image { get; set; }
 
         //ToDo: fix bug where select list is destroyed after invalid submission
         public List<SelectListItem> SubTypes { get; set; }

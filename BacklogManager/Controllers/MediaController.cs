@@ -81,7 +81,7 @@ namespace BacklogManager.Controllers
         }
 
         //consider using a ViewModel here when more apis will be passing their own values here.
-        public IActionResult Add(string imdbId, string title, string type)
+        public IActionResult Add(string imdbId, string title, string type, string image)
         {
 
             AddMediaObjectViewModel addMediaObjectViewModel = new AddMediaObjectViewModel(context.SubTypes.ToList());
@@ -91,8 +91,8 @@ namespace BacklogManager.Controllers
                 addMediaObjectViewModel.Title = title;
                 addMediaObjectViewModel.ExternalId = imdbId;
                 addMediaObjectViewModel.DatabaseSource = 1; //1 = IMDB
-
                 addMediaObjectViewModel.SubTypeID = context.SubTypes.Where(t => t.Name == type).Single().ID;
+                addMediaObjectViewModel.Image = image;
             }
 
             return View(addMediaObjectViewModel);
@@ -118,7 +118,8 @@ namespace BacklogManager.Controllers
                     RecommendSource = addMediaObjectViewModel.RecommendSource,
                     OwnerId = userId,
                     ExternalId = addMediaObjectViewModel.ExternalId,
-                    Interest = addMediaObjectViewModel.Interest
+                    Interest = addMediaObjectViewModel.Interest,
+                    Image = addMediaObjectViewModel.Image
                 };
 
                 context.MediaObjects.Add(newMediaObject);
