@@ -17,11 +17,8 @@ namespace BacklogManager.Controllers
         OMDbClient omdbClient = new OMDbClient();
         //Hosted web API REST Service base url
         string baseUrl = "https://www.omdbapi.com/";
-
-        //ToDo: add parameters title, year, and type
-        //ToDo: add request string contruction logic
-        //ToDo: Pass List of OMDbTitle objects to Search view.
-        [HttpGet]     //needs to be a get
+        
+        [HttpGet]
         public async Task<ActionResult> Index(string title, string year, string type, bool search)
         {
             //use try, except here to catch network errors and user input errors
@@ -46,7 +43,6 @@ namespace BacklogManager.Controllers
                 }
             }
 
-
             using (var client = new HttpClient())
             {
                 //Passing service base url
@@ -58,7 +54,6 @@ namespace BacklogManager.Controllers
                 client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
                 //Sending request to find web api REST service resource
-                //I predict I will need to tweak how the request string is constructed.
                 HttpResponseMessage response = await client.GetAsync(requestString);
 
                 //Checking if the response, sent using HttpClient, is successful or not
@@ -68,7 +63,6 @@ namespace BacklogManager.Controllers
                 }
                 //returning OMDbTitle list to view
                 return View("Search", omdbTitles);
-                //return View("Index", responseString);
             }
         }
 
@@ -112,6 +106,41 @@ namespace BacklogManager.Controllers
             }
 
             return omdbTitles;
+        }
+
+        private async Task<OMDbTitle> SearchById(string id)
+        {
+            OMDbTitle omdbTitle = new OMDbTitle();
+
+            string requestString = baseUrl + "?apikey=" + omdbClient.ApiKey;
+
+            //construct request string
+            if (id != null)
+            {
+                requestString = requestString + "&i=" + id;
+            }
+
+            using (var client = new HttpClient())
+            {
+                //Passing service base url
+                client.BaseAddress = new Uri(baseUrl);
+
+                client.DefaultRequestHeaders.Clear();
+
+                //Define request data format (default for omdb is JSON, may be extraneous)
+                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+                //Sending request to find web api REST service resource
+                HttpResponseMessage response = await client.GetAsync(requestString);
+
+                //Checking if the response, sent using HttpClient, is successful or not
+                if (response.IsSuccessStatusCode)
+                {
+                    omdbTitle = JsonToListOmdbTitles(response)[0];
+                }
+
+                return omdbTitle;
+            }
         }
     }
 }
