@@ -108,7 +108,7 @@ namespace BacklogManager.Controllers
             return omdbTitles;
         }
 
-        private async Task<OMDbTitle> SearchById(string id)
+        public async Task<OMDbTitle> GetById(string id)
         {
             OMDbTitle omdbTitle = new OMDbTitle();
 

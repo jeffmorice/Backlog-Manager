@@ -539,6 +539,29 @@ namespace BacklogManager.Controllers
             return Redirect("/Media/Index");
         }
 
+        public async Task<IActionResult> GetImagesImdb()
+        {
+            string userId = Common.ExtensionMethods.getUserId(this.User);
+            OMDbController omdbController = new OMDbController();
+            List<MediaObject> mediaObjects = context.MediaObjects.
+                    Where(u => u.OwnerId == userId).
+                    Where(d => d.DatabaseSource == 1).
+                    Where(img => img.Image == null).
+                    ToList();
 
+            foreach (MediaObject mediaObject in mediaObjects)
+            {
+                OMDbTitle omdbTitle = await omdbController.GetById(mediaObject.ExternalId);
+
+                if (omdbTitle.Poster != "N/A" & omdbTitle.Poster != null)
+                {
+                    mediaObject.Image = omdbTitle.Poster;
+                }
+            }
+
+            context.SaveChanges();
+
+            return Redirect("/Media/Index");
+        }
     }
 }
