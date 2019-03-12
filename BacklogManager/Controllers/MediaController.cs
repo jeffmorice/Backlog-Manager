@@ -75,7 +75,12 @@ namespace BacklogManager.Controllers
             MediaIndexViewModel mediaIndexViewModel = new MediaIndexViewModel
             {
                 MediaBySubTypeViewModels = mediaBySubTypeViewModels,
-                UpdateMediaObjectViewModel = new UpdateMediaObjectViewModel()
+                UpdateMediaObjectViewModel = new UpdateMediaObjectViewModel(),
+                BacklogCount = context.MediaObjects.
+                    Where(u => u.OwnerId == userId).
+                    Where(d => d.Deleted == false).
+                    Where(d => d.Completed == false).
+                    Count()
             };
 
             return View(mediaIndexViewModel);

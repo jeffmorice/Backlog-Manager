@@ -9,7 +9,7 @@
 
 @if (Model.MediaBySubTypeViewModels.Count != 1)
 {
-    <h1>My Backlog</h1>
+    <h1><strong>My Backlog</strong> (@Model.BacklogCount)</h1>
     <p>
         Find all titles in your Backlog listed here.
     </p>
@@ -23,7 +23,7 @@
         <div>
             <h4>
                 <a href="/Media/Index?subTypeId=@mbstvm.MediaSubType.ID">
-                    <strong>@mbstvm.MediaSubType.Name Backlog</strong>
+                    <strong>@mbstvm.MediaSubType.Name Backlog</strong> (@mbstvm.MediaObjects.Count())
                 </a>
                 | <input type="submit" form="@mbstvm.MediaSubType.Name" value="Save Changes" />
             </h4>
