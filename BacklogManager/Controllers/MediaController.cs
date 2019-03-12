@@ -43,6 +43,7 @@ namespace BacklogManager.Controllers
 
             List<MediaBySubTypeViewModel> mediaBySubTypeViewModels = new List<MediaBySubTypeViewModel>();
             List<SubType> subTypes = new List<SubType>();
+            int incompleteTitles = 0;
 
             if (subTypeId != 0)
             {
@@ -55,15 +56,20 @@ namespace BacklogManager.Controllers
 
             foreach (SubType subType in subTypes)
             {
-                MediaBySubTypeViewModel mediaBySubTypeViewModel = new MediaBySubTypeViewModel
-                {
-                    MediaSubType = subType,
-                    MediaObjects = context.MediaObjects.
+                List<MediaObject> mediaObjects = context.MediaObjects.
                     Include(s => s.MediaSubType).
                     Where(u => u.OwnerId == userId).
                     Where(d => d.Deleted == false).
                     Where(sti => sti.SubTypeID == subType.ID).
-                    ToList()
+                    ToList();
+                int incompleteBySubType = mediaObjects.Where(c => c.Completed == false).Count();
+                incompleteTitles += incompleteBySubType;
+
+                MediaBySubTypeViewModel mediaBySubTypeViewModel = new MediaBySubTypeViewModel
+                {
+                    MediaSubType = subType,
+                    MediaObjects = mediaObjects,
+                    BacklogCount = incompleteBySubType
                 };
 
                 if (mediaBySubTypeViewModel.MediaObjects.Count() != 0)
@@ -76,11 +82,7 @@ namespace BacklogManager.Controllers
             {
                 MediaBySubTypeViewModels = mediaBySubTypeViewModels,
                 UpdateMediaObjectViewModel = new UpdateMediaObjectViewModel(),
-                BacklogCount = context.MediaObjects.
-                    Where(u => u.OwnerId == userId).
-                    Where(d => d.Deleted == false).
-                    Where(d => d.Completed == false).
-                    Count()
+                BacklogCount = incompleteTitles
             };
 
             return View(mediaIndexViewModel);

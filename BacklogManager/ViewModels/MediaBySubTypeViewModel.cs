@@ -10,6 +10,7 @@ namespace BacklogManager.ViewModels
     {
         public SubType MediaSubType { get; set; }
         public List<MediaObject> MediaObjects { get; set; }
+        public int BacklogCount { get; set; }
 
         public MediaBySubTypeViewModel() { }
     }
