@@ -129,6 +129,9 @@ namespace BacklogManager.Controllers
                 return Redirect("/");
             }
 
+            //in the event of invalid ModelState
+            addMediaObjectViewModel.SubTypes = GetSelectListSubTypes();
+
             return View(addMediaObjectViewModel);
 
         }
