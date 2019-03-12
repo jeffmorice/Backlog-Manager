@@ -260,7 +260,7 @@ namespace BacklogManager.Controllers
             return View(omdbTitles);
         }
 
-        public IActionResult RandomSuggestion()
+        public IActionResult RandomSuggestion(int id)
         {
             string userId = Common.ExtensionMethods.getUserId(this.User);
 
@@ -273,6 +273,12 @@ namespace BacklogManager.Controllers
                 Where(l => int.Parse(l.LastSuggested.ToString("yyyyMMdd")) < int.Parse(DateTime.Now.ToString("yyyyMMdd"))).
                 ToList();
             List<MediaObject> randomMedia = new List<MediaObject>();
+
+            if (id != 0)
+            {
+                mediaObjects = mediaObjects.Where(i => i.SubTypeID == id).ToList();
+            }
+
             //SuggestionViewModel suggestionViewModel = new SuggestionViewModel(context.SubTypes.ToList());
             int numSuggestion = 3;
 
@@ -314,7 +320,7 @@ namespace BacklogManager.Controllers
             return View(suggestionViewModelA);
         }
 
-        public IActionResult WeightedSuggestion()
+        public IActionResult WeightedSuggestion(int id)
         {
             string userId = Common.ExtensionMethods.getUserId(this.User);
 
@@ -327,6 +333,12 @@ namespace BacklogManager.Controllers
                 Where(l => int.Parse(l.LastSuggested.ToString("yyyyMMdd")) < int.Parse(DateTime.Now.ToString("yyyyMMdd"))).
                 ToList();
             List<MediaObject> weightedRandomMedia = new List<MediaObject>();
+
+            if (id != 0)
+            {
+                mediaObjects = mediaObjects.Where(i => i.SubTypeID == id).ToList();
+            }
+
             int numSuggestion = 3;
             bool ignoreDoubles = true;
 
