@@ -247,7 +247,7 @@ namespace BacklogManager.Controllers
             return Redirect("/");
         }
 
-        public IActionResult Search()
+        public IActionResult SearchImdb()
         {
             List<OMDbTitle> omdbTitles = new List<OMDbTitle>();
 

@@ -62,7 +62,7 @@ namespace BacklogManager.Controllers
                     omdbTitles = JsonToListOmdbTitles(response);
                 }
                 //returning OMDbTitle list to view
-                return View("Search", omdbTitles);
+                return View("SearchImdb", omdbTitles);
             }
         }
 
