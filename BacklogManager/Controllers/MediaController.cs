@@ -253,13 +253,7 @@ namespace BacklogManager.Controllers
 
             return View(omdbTitles);
         }
-
-        [HttpPost]
-        public IActionResult Search(List<OMDbTitle> omdbTitles)
-        {
-            return View(omdbTitles);
-        }
-
+        
         public IActionResult RandomSuggestion(int id)
         {
             string userId = Common.ExtensionMethods.getUserId(this.User);
