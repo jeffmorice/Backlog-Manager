@@ -6,7 +6,7 @@
 }
 
 <h2>@Model.Title</h2>
-
+<br />
 <div>
     <table>
         <tr>
@@ -14,8 +14,8 @@
                 <img src="@Model.Image" height="320" />
             </td>
             <td>
-                <div>
-                    <h3 style="padding:8px">Edit Title Details</h3>
+                <div style="padding:8px">
+                    <h3 style="padding:8px">Edit Title Data</h3>
                     <form asp-action="Edit">
                         <table class="table">
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -76,38 +76,96 @@
 <br />
 <br />
 
-@* Split here, Display items in a separate table below. *@
-
+@* Display IMDB data *@
+@if (Model.MediaObject.DatabaseSource == 1) 
+{
 <div>
-    <h3>Title Stats</h3>
+    <h3 style="padding:8px">Title Details</h3>
     <table class="table">
+        @* Upright display *@
+        @if (Model.MediaObject.MediaSubType.Name == "Movie" || Model.MediaObject.MediaSubType.Name == "Episode")
+        {
+            <tr>
+                <th>Director(s)</th>
+                <td>@Model.OMDbTitle.Director</td>
+            </tr>
+        }
         <tr>
-            <th>Update Count</th>
-            <th>Date Added</th>
-            <th>Suggested Count</th>
-            <th>Selected Count</th>
-            <th>Date Last Suggested</th>
-            @if (Model.MediaObject.ExternalId != null)
-            {
-                <th>External Link</th>
-            }
+            <th>Writer(s)</th>
+            <td>@Model.OMDbTitle.Writer</td>
         </tr>
         <tr>
-            <td>@Model.MediaObject.UpdateCount</td>
-            <td>@Model.MediaObject.DateAdded.ToString("M-d-yyyy")</td>
-            <td>@Model.MediaObject.SuggestedCount</td>
-            <td>@Model.MediaObject.SelectedCount</td>
-            <td>@Model.MediaObject.LastSuggested.ToString("M-d-yyyy")</td>
-            @if (Model.MediaObject.ExternalId != null & Model.MediaObject.DatabaseSource == 1)
+            <th>Stars</th>
+            <td>@Model.OMDbTitle.Actors</td>
+        </tr>
+    </table>
+    <table class="table">
+        @* Horizontal display *@
+        <tr>
+            @if (Model.MediaObject.MediaSubType.Name == "Series")
             {
-                <td><a href="https://www.imdb.com/title/@Model.MediaObject.ExternalId">IMDB</a></td>
+                <th>Series</th>
             }
+            @if (Model.MediaObject.MediaSubType.Name == "Episode")
+            {
+                <th>Season</th>
+                <th>Episode</th>
+            }
+            @* Common info *@
+            <th>Runtime</th>
+            <th>Rated</th>
+            <th>Genre</th>
+            <th>Year</th>
+            <th>External Link</th>
+        </tr>
+        <tr>
+            @if (Model.MediaObject.MediaSubType.Name == "Series")
+            {
+                @* Series info *@
+                <td>@Model.OMDbTitle.totalSeasons</td>
+            }
+            @if (Model.MediaObject.MediaSubType.Name == "Episode")
+            {
+                @* Episode info *@
+                <td>@Model.OMDbTitle.Season</td>
+                <td>@Model.OMDbTitle.Episode</td>
+            }
+            @* Common info *@
+            <td>@Model.OMDbTitle.Runtime</td>
+            <td>@Model.OMDbTitle.Rated</td>
+            <td>@Model.OMDbTitle.Genre</td>
+            <td>@Model.OMDbTitle.Year</td>
+            <td><a href="https://www.imdb.com/title/@Model.MediaObject.ExternalId">IMDB</a></td>
         </tr>
     </table>
 </div>
+}
 
+<br />
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div>
+        <h3>Title Stats</h3>
+        <table class="table">
+            <tr>
+                <th>Update Count</th>
+                <th>Date Added</th>
+                <th>Suggested Count</th>
+                <th>Selected Count</th>
+                <th>Date Last Suggested</th>
+            </tr>
+            <tr>
+                <td>@Model.MediaObject.UpdateCount</td>
+                <td>@Model.MediaObject.DateAdded.ToString("M-d-yyyy")</td>
+                <td>@Model.MediaObject.SuggestedCount</td>
+                <td>@Model.MediaObject.SelectedCount</td>
+                <td>@Model.MediaObject.LastSuggested.ToString("M-d-yyyy")</td>
+            </tr>
+        </table>
+    </div>
+
+<br />
+
+    <div>
+        <a asp-action="Index">Back to List</a>
+    </div>
 

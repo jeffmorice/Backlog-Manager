@@ -32,6 +32,8 @@ namespace BacklogManager.ViewModels
         [NotMapped]
         public MediaObject MediaObject { get; set; }
         public List<SelectListItem> SubTypes { get; set; }
+        [NotMapped]
+        public OMDbTitle OMDbTitle { get; set; }
 
         public EditMediaObjectViewModel() { }
 

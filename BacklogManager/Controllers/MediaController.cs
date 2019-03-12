@@ -428,7 +428,7 @@ namespace BacklogManager.Controllers
             return Redirect("/Media/Index");
         }
 
-        public IActionResult Details(int ID)
+        public async Task<IActionResult> Details(int ID)
         {
             string userId = Common.ExtensionMethods.getUserId(this.User);
             MediaObject mediaObject = context.MediaObjects.
@@ -440,6 +440,12 @@ namespace BacklogManager.Controllers
             {
                 EditMediaObjectViewModel editMediaObjectViewModel = new EditMediaObjectViewModel(mediaObject, GetSelectListSubTypes());
 
+                if (mediaObject.DatabaseSource == 1)
+                {
+                    OMDbTitle omdbTitle = await GetImdbData(mediaObject.ExternalId);
+                    editMediaObjectViewModel.OMDbTitle = omdbTitle;
+                }
+                
                 return View(editMediaObjectViewModel);
             }
 
@@ -612,6 +618,14 @@ namespace BacklogManager.Controllers
                 //mediaObject.UpdateCount = rand.Next(0, 4);
             }
             context.SaveChanges();
+        }
+
+        public async Task<OMDbTitle> GetImdbData(string externalId)
+        {
+            OMDbController omdbController = new OMDbController();
+            OMDbTitle omdbTitle = await omdbController.GetById(externalId);
+
+            return omdbTitle;
         }
 
         //Admin Debug actions
