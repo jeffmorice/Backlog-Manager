@@ -20,7 +20,7 @@
     @foreach (MediaBySubTypeViewModel mbstvm in Model.MediaBySubTypeViewModels)
     {
         <br />
-        <div> 
+        <div>
             <h4>
                 <a href="/Media/Index?subTypeId=@mbstvm.MediaSubType.ID">
                     <strong>@mbstvm.MediaSubType.Name Backlog</strong>
@@ -43,7 +43,7 @@
                     {
                         <tr>
                             <td>
-                                @mediaObject.Title
+                                <a asp-controller="Media" asp-action="Details" asp-route-id="@mediaObject.ID">@mediaObject.Title</a>
                                 <input type="hidden" name="mediaIds" id="@mediaObject.ID" value="@mediaObject.ID" />
                             </td>
                             <td>
