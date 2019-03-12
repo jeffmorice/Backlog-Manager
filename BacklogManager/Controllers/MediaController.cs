@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using BacklogManager.Common;
 using System.Net.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BacklogManager.Controllers
 {
@@ -68,7 +69,7 @@ namespace BacklogManager.Controllers
                 if (mediaBySubTypeViewModel.MediaObjects.Count() != 0)
                 {
                     mediaBySubTypeViewModels.Add(mediaBySubTypeViewModel);
-                } 
+                }
             }
 
             MediaIndexViewModel mediaIndexViewModel = new MediaIndexViewModel
@@ -84,7 +85,7 @@ namespace BacklogManager.Controllers
         public IActionResult Add(string imdbId, string title, string type, string image)
         {
 
-            AddMediaObjectViewModel addMediaObjectViewModel = new AddMediaObjectViewModel(context.SubTypes.ToList());
+            AddMediaObjectViewModel addMediaObjectViewModel = new AddMediaObjectViewModel(GetSelectListSubTypes());
 
             if (imdbId != null & title != null)
             {
@@ -127,6 +128,7 @@ namespace BacklogManager.Controllers
 
                 return Redirect("/");
             }
+
             return View(addMediaObjectViewModel);
 
         }
@@ -167,10 +169,9 @@ namespace BacklogManager.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Update(UpdateMediaObjectViewModel updateMediaObjectViewModel)
         {
-            //ToDo: allow for text fields to be updated via form input.
-            //ToDo: complete Update logic using ViewModel
             if (ModelState.IsValid)
             {
                 int i = 0;
@@ -180,54 +181,49 @@ namespace BacklogManager.Controllers
                 List<bool> startedBools = StripAndConvertIntArrayToListBool(updateMediaObjectViewModel.StartedValues);
                 //completed
                 List<bool> completedBools = StripAndConvertIntArrayToListBool(updateMediaObjectViewModel.CompletedValues);
-                
+
                 foreach (int ID in updateMediaObjectViewModel.MediaIDs)
                 {
                     //find media object in database
-                    MediaObject updateCandidate = context.MediaObjects.Single(m => m.ID == ID);
                     bool countUpdate = false;
-
                     string userId = Common.ExtensionMethods.getUserId(this.User);
+                    MediaObject updateCandidate = context.MediaObjects.
+                        Where(u => u.OwnerId == userId).
+                        Single(m => m.ID == ID);
 
-                    if (userId == updateCandidate.OwnerId)
+                    //check if Started value has changed, then add to UpdateCount
+                    //compare existing value to new value
+                    if (updateCandidate.Started != startedBools[i])
                     {
-                        //check if Started value has changed, then add to UpdateCount
-                        //compare existing value to new value
-                        if (updateCandidate.Started != startedBools[i])
+                        //then update
+                        updateCandidate.Started = startedBools[i];
+                        countUpdate = true;
+                    }
+                    //check if Completed value has changed
+                    if (updateCandidate.Completed != completedBools[i])
+                    {
+                        //then update
+                        updateCandidate.Completed = completedBools[i];
+                        countUpdate = true;
+                    }
+                    //check if Interest value has changed
+                    if (updateCandidate.Interest != updateMediaObjectViewModel.Interest[i])
+                    {
+                        //check if value is in range
+                        if (1 <= updateMediaObjectViewModel.Interest[i] & updateMediaObjectViewModel.Interest[i] <= 10)
                         {
                             //then update
-                            updateCandidate.Started = startedBools[i];
-                            countUpdate = true;
-                        }
-                        //check if Completed value has changed
-                        if (updateCandidate.Completed != completedBools[i])
-                        {
-                            //then update
-                            updateCandidate.Completed = completedBools[i];
-                            countUpdate = true;
-                        }
-                        //check if Interest value has changed
-                        if (updateCandidate.Interest != updateMediaObjectViewModel.Interest[i])
-                        {
-                            //check if value is in range
-                            if (1 <= updateMediaObjectViewModel.Interest[i] & updateMediaObjectViewModel.Interest[i] <= 10)
-                            {
-                                //then update
-                                updateCandidate.Interest = updateMediaObjectViewModel.Interest[i];
-                                //check if new value is > existing value, if not don't count the update
-                                if (updateMediaObjectViewModel.Interest[i] > updateCandidate.Interest) { countUpdate = true; }
-                            }
-                        }
-                        if (countUpdate)
-                        {
-                            updateCandidate.UpdateCount += 1;
+                            updateCandidate.Interest = updateMediaObjectViewModel.Interest[i];
+                            //check if new value is > existing value, if not don't count the update
+                            if (updateMediaObjectViewModel.Interest[i] > updateCandidate.Interest) { countUpdate = true; }
                         }
                     }
+                    if (countUpdate) { updateCandidate.UpdateCount += 1; }
 
                     i++;
                 }
             }
-            
+
             context.SaveChanges();
 
             //Then check for deleted Ids and pass any to the DeletePrompt route
@@ -240,7 +236,7 @@ namespace BacklogManager.Controllers
 
             return Redirect("/");
         }
-        
+
         public IActionResult Search()
         {
             List<OMDbTitle> omdbTitles = new List<OMDbTitle>();
@@ -269,7 +265,7 @@ namespace BacklogManager.Controllers
             List<MediaObject> randomMedia = new List<MediaObject>();
             //SuggestionViewModel suggestionViewModel = new SuggestionViewModel(context.SubTypes.ToList());
             int numSuggestion = 3;
-            
+
             //ensure the while loop does not continue needlessly when too few items in list
             if (mediaObjects.Count <= numSuggestion)
             {
@@ -432,6 +428,106 @@ namespace BacklogManager.Controllers
             return Redirect("/Media/Index");
         }
 
+        public IActionResult Details(int ID)
+        {
+            string userId = Common.ExtensionMethods.getUserId(this.User);
+            MediaObject mediaObject = context.MediaObjects.
+                Include(s => s.MediaSubType).
+                Where(u => u.OwnerId == userId).
+                SingleOrDefault(o => o.ID == ID);
+
+            if (mediaObject != null)
+            {
+                EditMediaObjectViewModel editMediaObjectViewModel = new EditMediaObjectViewModel(mediaObject, GetSelectListSubTypes());
+
+                return View(editMediaObjectViewModel);
+            }
+
+            return Redirect("/Media/Index");
+        }
+
+        //second Details action to accept a view model?
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(EditMediaObjectViewModel editMediaObjectViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                string userId = Common.ExtensionMethods.getUserId(this.User);
+                bool countUpdate = false;
+                MediaObject editCandidate = context.MediaObjects.
+                    Where(u => u.OwnerId == userId).
+                    Where(i => i.ID == editMediaObjectViewModel.ID).
+                    SingleOrDefault();
+
+                //compare existing values to new values
+                if (editCandidate.Title != editMediaObjectViewModel.Title)
+                {
+                    editCandidate.Title = editMediaObjectViewModel.Title;
+                    countUpdate = true;
+                }
+                if (editCandidate.SubTypeID != editMediaObjectViewModel.SubTypeID)
+                {
+                    editCandidate.SubTypeID = editMediaObjectViewModel.SubTypeID;
+                    countUpdate = true;
+                }
+                if (editCandidate.RecommendSource != editMediaObjectViewModel.RecommendSource)
+                {
+                    editCandidate.RecommendSource = editMediaObjectViewModel.RecommendSource;
+                    countUpdate = true;
+                }
+                //check if Interest value has changed
+                if (editCandidate.Interest != editMediaObjectViewModel.Interest)
+                {
+                    //check if value is in range
+                    if (1 <= editMediaObjectViewModel.Interest & editMediaObjectViewModel.Interest <= 10)
+                    {
+                        //check if new value is > existing value, if not don't count the update
+                        if (editMediaObjectViewModel.Interest > editCandidate.Interest) { countUpdate = true; }
+                        editCandidate.Interest = editMediaObjectViewModel.Interest;
+                    }
+                }
+                if (editCandidate.Image != editMediaObjectViewModel.Image)
+                {
+                    editCandidate.Image = editMediaObjectViewModel.Image;
+                    countUpdate = true;
+                }
+
+                //strip double values
+                //started
+                List<bool> startedBools = StripAndConvertIntArrayToListBool(editMediaObjectViewModel.StartedValue);
+                //completed
+                List<bool> completedBools = StripAndConvertIntArrayToListBool(editMediaObjectViewModel.CompletedValue);
+
+                //check if Started value has changed, then add to UpdateCount
+                if (editCandidate.Started != startedBools[0])
+                {
+                    editCandidate.Started = startedBools[0];
+                    countUpdate = true;
+                }
+                //check if Completed value has changed
+                if (editCandidate.Completed != completedBools[0])
+                {
+                    editCandidate.Completed = completedBools[0];
+                    countUpdate = true;
+                }
+                if (countUpdate) { editCandidate.UpdateCount += 1; }
+
+                context.SaveChanges();
+            }
+
+            //Then check for deleted Id and pass any to the DeletePrompt route
+            if (editMediaObjectViewModel.DeletedIDs != null)
+            {
+                List<MediaObject> mediaToDelete = new List<MediaObject>();
+                mediaToDelete = ArrayIdsToListMediaObjects(editMediaObjectViewModel.DeletedIDs);
+                return View("DeletePrompt", mediaToDelete);
+            }
+
+            return Redirect("/Media/Details?id=" + editMediaObjectViewModel.ID);
+        }
+
         //Methods
 
         public List<MediaObject> ArrayIdsToListMediaObjects(int[] arrayIds)
@@ -562,6 +658,74 @@ namespace BacklogManager.Controllers
             context.SaveChanges();
 
             return Redirect("/Media/Index");
+        }
+
+        public List<SelectListItem> GetSelectListSubTypes()
+        {
+            List<SubType> subTypes = context.SubTypes.ToList();
+
+            //this list is the accumulator and the return value
+            List<SelectListItem> subTypeSelectItems = new List<SelectListItem>();
+            subTypeSelectItems.Add(new SelectListItem
+            {
+                Value = null,
+                Text = "------"
+            });
+
+            //Make a copy of the IEnumerable as a list
+            List<SubType> subTypesList = new List<SubType>(subTypes);
+
+            //Make a copy of the complete list and use it like a de-accumulator to remove already appended IDs.
+            List<SubType> remainingSubTypes = new List<SubType>(subTypes);
+
+            //for each item in list of remaining subtypes
+            //constructs select list with 3 level hierarchy: Parent > Child > GrandChild
+            //ToDo: improve with recursive approach
+            while (remainingSubTypes.Count > 0)
+            {
+                SubType subType = remainingSubTypes[0];
+
+                //add them to the accumulator
+                subTypeSelectItems.Add(new SelectListItem
+                {
+                    Value = subType.ID.ToString(),
+                    Text = subType.Name
+                });
+
+                //remove from the de-accumulator
+                remainingSubTypes.Remove(subType);
+
+                foreach (SubType potentialChild in subTypesList)
+                {
+                    if (potentialChild.ParentID == subType.ID)
+                    {
+                        //When found:
+                        //1) append subtypes to the accumulator list with some annotation like "--" to place them beneath each other.
+                        subTypeSelectItems.Add(new SelectListItem
+                        {
+                            Value = potentialChild.ID.ToString(),
+                            Text = "-- " + potentialChild.Name
+                        });
+                        //2) remove subtype from remaining list
+                        remainingSubTypes.Remove(potentialChild);
+
+                        foreach (SubType potentialGrandChild in subTypesList)
+                        {
+                            if (potentialGrandChild.ParentID == potentialChild.ID)
+                            {
+                                subTypeSelectItems.Add(new SelectListItem
+                                {
+                                    Value = potentialGrandChild.ID.ToString(),
+                                    Text = "---- " + potentialGrandChild.Name
+                                });
+
+                                remainingSubTypes.Remove(potentialGrandChild);
+                            }
+                        }
+                    }
+                }
+            }
+            return subTypeSelectItems;
         }
     }
 }
