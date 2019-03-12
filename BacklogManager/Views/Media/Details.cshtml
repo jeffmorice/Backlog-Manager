@@ -1,0 +1,113 @@
+﻿@model BacklogManager.ViewModels.EditMediaObjectViewModel
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@Model.Title</h2>
+
+<div>
+    <table>
+        <tr>
+            <td>
+                <img src="@Model.Image" height="320" />
+            </td>
+            <td>
+                <div>
+                    <h3 style="padding:8px">Edit Title Details</h3>
+                    <form asp-action="Edit">
+                        <table class="table">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="ID" />
+                            <tr>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Source</th>
+                                <th>Interest (1-10)</th>
+                                <th>Started</th>
+                                <th>Completed</th>
+                                <th>Delete</th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input asp-for="Title" class="form-control" />
+                                    <span asp-validation-for="Title" class="text-danger"></span>
+                                </td>
+                                <td>
+                                    <select asp-for="SubTypeID" asp-items="Model.SubTypes"></select>
+                                    <span asp-validation-for="SubTypeID" class="text-danger"></span>
+                                    <span asp-validation-for="SubTypeID" class="text-danger"></span>
+                                </td>
+                                <td>
+                                    <input asp-for="RecommendSource" class="form-control" />
+                                    <span asp-validation-for="RecommendSource" class="text-danger"></span>
+                                </td>
+                                <td>
+                                    <input asp-for="Interest" class="form-control" />
+                                    <span asp-validation-for="Interest" class="text-danger"></span>
+                                </td>
+                                <td>
+                                    <input type="hidden" name="startedValue" id="@Model.ID" value="0" />
+                                    <input type="checkbox" name="startedValue" id="@Model.ID" value="1" checked="@Model.MediaObject.Started" />
+                                </td>
+                                <td>
+                                    <input type="hidden" name="completedValue" id="@Model.ID" value="0" />
+                                    <input type="checkbox" name="completedValue" id="@Model.ID" value="1" checked="@Model.MediaObject.Completed" />
+                                </td>
+                                <td><input type="checkbox" name="deletedIds" id="@Model.ID" value="@Model.ID" /></td>
+                            </tr>
+                        </table>
+                        <div style="padding:8px">
+                            <label>Choose New Image</label>
+                            <input asp-for="Image" class="form-control" />
+                            <span asp-validation-for="Image" class="text-danger"></span>
+                        </div>
+                        <div style="padding:8px">
+                            <input type="submit" value="Save" class="btn btn-default" />
+                        </div>
+                    </form>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<br />
+<br />
+
+@* Split here, Display items in a separate table below. *@
+
+<div>
+    <h3>Title Stats</h3>
+    <table class="table">
+        <tr>
+            <th>Update Count</th>
+            <th>Date Added</th>
+            <th>Suggested Count</th>
+            <th>Selected Count</th>
+            <th>Date Last Suggested</th>
+            @if (Model.MediaObject.ExternalId != null)
+            {
+                <th>External Link</th>
+            }
+        </tr>
+        <tr>
+            <td>@Model.MediaObject.UpdateCount</td>
+            <td>@Model.MediaObject.DateAdded.ToString("M-d-yyyy")</td>
+            <td>@Model.MediaObject.SuggestedCount</td>
+            <td>@Model.MediaObject.SelectedCount</td>
+            <td>@Model.MediaObject.LastSuggested.ToString("M-d-yyyy")</td>
+            @if (Model.MediaObject.ExternalId != null & Model.MediaObject.DatabaseSource == 1)
+            {
+                <td><a href="https://www.imdb.com/title/@Model.MediaObject.ExternalId">IMDB</a></td>
+            }
+        </tr>
+    </table>
+</div>
+
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
