@@ -15,6 +15,7 @@ namespace BacklogManager.ViewModels
         public string Title { get; set; }
         [Required]
         [Display(Name =  "Type")]
+        [Range(1, int.MaxValue, ErrorMessage = "Please select a media type.")]
         public int SubTypeID { get; set; }
         [Required]
         public int DatabaseSource { get; set; }

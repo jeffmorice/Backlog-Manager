@@ -432,6 +432,62 @@ namespace BacklogManager.Controllers
             return View(suggestionViewModelA);
         }
 
+        public IActionResult SearchBacklog(SearchBacklogViewModel searchTerms)
+        {
+            string userId = Common.ExtensionMethods.getUserId(this.User);
+            searchTerms.SubTypes = GetSelectListSubTypes();
+
+            if (searchTerms != null)
+            {
+                List<MediaObject> searchResults = context.MediaObjects.Where(u => u.OwnerId == userId).ToList();
+
+                //Refine searchResults
+                //Title - search for similar results
+                if (searchTerms.Title != null)
+                {
+                    searchResults = searchResults.Where(t => t.Title.ToLower().Contains(searchTerms.Title.ToLower())).ToList();
+                    //searchResults = searchResults.Where(t => EF.Functions.Like(t.Title, searchTerms.Title)).ToList();
+                }
+                //SubType - 0 indicates "All"
+                if (searchTerms.SubTypeID != 0)
+                {
+                    searchResults = searchResults.Where(t => t.SubTypeID == searchTerms.SubTypeID).ToList();
+                }
+                //Database - should default to "All" and if not all, should refine results. Hardcode -1 to denote "All?
+                searchResults = searchResults.Where(t => t.DatabaseSource == searchTerms.DatabaseSource).ToList();
+                //Completed - allow null value
+                searchResults = searchResults.Where(t => t.Completed == searchTerms.Completed).ToList();
+                //Started - allow null value
+                searchResults = searchResults.Where(t => t.Started == searchTerms.Started).ToList();
+                ////Date Added - check if before or after (string to int, compare greater than, less than, or equal to)
+                ////create property to hold this value
+                //if (int.Parse(searchTerms.DateAdded.ToString("yyyyMMdd")) != 00010101)
+                //{
+                //    //earlier than given date
+                //    searchResults = searchResults.Where(t => int.Parse(t.DateAdded.ToString("yyyyMMdd")) > int.Parse(searchTerms.DateAdded.ToString("yyyyMMdd"))).ToList();
+                //}
+                //Recommendation Source
+                if (searchTerms.RecommendSource != null)
+                {
+                    searchResults = searchResults.Where(t => EF.Functions.Like(t.RecommendSource, searchTerms.RecommendSource)).ToList();
+                }
+                //Interest - check for greater, less than, equal to?
+                if (searchTerms.Interest != 0)
+                {
+                    searchResults = searchResults.Where(t => t.Interest == searchTerms.Interest).ToList();
+                }
+                ////Date Last Suggested - check if before or after
+                //if (int.Parse(searchTerms.LastSuggested.ToString("yyyyMMdd")) != 00010101)
+                //{
+                //    searchResults = searchResults.Where(t => t.LastSuggested == searchTerms.LastSuggested).ToList();
+                //}
+
+                searchTerms.MediaObjects = searchResults;
+            }
+
+            return View(searchTerms);
+        }
+
         public IActionResult SelectTitle(int ID)
         {
             //increment SelectedCount
@@ -467,9 +523,7 @@ namespace BacklogManager.Controllers
 
             return Redirect("/Media/Index");
         }
-
-        //second Details action to accept a view model?
-
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(EditMediaObjectViewModel editMediaObjectViewModel)
@@ -698,7 +752,7 @@ namespace BacklogManager.Controllers
             List<SelectListItem> subTypeSelectItems = new List<SelectListItem>();
             subTypeSelectItems.Add(new SelectListItem
             {
-                Value = null,
+                Value = "0",
                 Text = "------"
             });
 

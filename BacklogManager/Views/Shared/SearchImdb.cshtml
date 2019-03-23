@@ -52,14 +52,14 @@
                             <td><img src="https://i.ibb.co/mBByDjW/No-Image-Placeholder.png" height="128" /></td>
                         }
                         <td>
-                            <a href="https://www.imdb.com/title/@title.ImdbId" >@title.Title</a>
+                            <a href="https://www.imdb.com/title/@title.ImdbId">@title.Title</a>
                         </td>
                         <td>@title.Year</td>
                         <td>@title.Type</td>
                         <td>
                             <form method="get" asp-controller="Media" asp-action="Add">
                                 <input type="hidden" name="imdbId" value="@title.ImdbId" />
-                                <input type="hidden" name="title" value="@title.Title"/>
+                                <input type="hidden" name="title" value="@title.Title" />
                                 <input type="hidden" name="type" value="@title.Type" />
                                 <input type="hidden" name="image" value="@title.Poster" />
                                 <input type="submit" value="Add" class="btn btn-default" />
@@ -68,12 +68,12 @@
                     </tr>
                 }
             }
-            else
-            {
-                <p>No results</p>
-            }
         }
     </table>
+    @if (Model.Count == 0)
+    {
+        <p>No results</p>
+    }
 </div>
 
 @* If not, click through to add a generic MediaObject *@
