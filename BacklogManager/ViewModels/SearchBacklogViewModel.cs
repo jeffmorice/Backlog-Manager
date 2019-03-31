@@ -19,16 +19,18 @@ namespace BacklogManager.ViewModels
         public int SubTypeID { get; set; }
         [Display(Name = "Source Database")]
         public int DatabaseSource { get; set; }
-        public bool Completed { get; set; }
-        public bool Started { get; set; }
-        [Display(Name = "Date Added")]
-        public DateTime DateAdded { get; set; }
+        public int Started { get; set; }
+        public int Completed { get; set; }
         [Display(Name = "Recommendation Source")]
         public string RecommendSource { get; set; }
         [Display(Name = "Interest Level")]
         public int Interest { get; set; }
+        [Display(Name = "Date Added")]
+        public DateTime DateAdded { get; set; }
         [Display(Name = "Date Last Suggested")]
         public DateTime LastSuggested { get; set; }
+
+        public string Search { get; set; } = null;
 
         public List<SelectListItem> SubTypes { get; set; }
 

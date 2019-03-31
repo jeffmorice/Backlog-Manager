@@ -267,3 +267,4 @@ __pycache__/
 /BacklogManager/ScaffoldingReadme.txt
 /BacklogManager/Common/OMDbClient.cs
 /Notes
+*.DS_Store

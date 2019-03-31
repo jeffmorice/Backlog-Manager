@@ -436,10 +436,14 @@ namespace BacklogManager.Controllers
         {
             string userId = Common.ExtensionMethods.getUserId(this.User);
             searchTerms.SubTypes = GetSelectListSubTypes();
+            List<MediaObject> searchResults = new List<MediaObject>();
 
-            if (searchTerms != null)
+            if (searchTerms.Search != null) //runs no matter what
             {
-                List<MediaObject> searchResults = context.MediaObjects.Where(u => u.OwnerId == userId).ToList();
+                searchResults = context.MediaObjects.
+                    Where(u => u.OwnerId == userId).
+                    Where(d => d.Deleted == false).
+                    ToList();
 
                 //Refine searchResults
                 //Title - search for similar results
@@ -448,17 +452,41 @@ namespace BacklogManager.Controllers
                     searchResults = searchResults.Where(t => t.Title.ToLower().Contains(searchTerms.Title.ToLower())).ToList();
                     //searchResults = searchResults.Where(t => EF.Functions.Like(t.Title, searchTerms.Title)).ToList();
                 }
-                //SubType - 0 indicates "All"
+                //SubType - 0 = All
                 if (searchTerms.SubTypeID != 0)
                 {
                     searchResults = searchResults.Where(t => t.SubTypeID == searchTerms.SubTypeID).ToList();
                 }
-                //Database - should default to "All" and if not all, should refine results. Hardcode -1 to denote "All?
-                searchResults = searchResults.Where(t => t.DatabaseSource == searchTerms.DatabaseSource).ToList();
-                //Completed - allow null value
-                searchResults = searchResults.Where(t => t.Completed == searchTerms.Completed).ToList();
-                //Started - allow null value
-                searchResults = searchResults.Where(t => t.Started == searchTerms.Started).ToList();
+                //Database - 0 = All
+                if (searchTerms.DatabaseSource != 0)
+                {
+                    //ToDo: fix hardcoded solution, whereby form value is offset for display purposes and corrected here
+                    searchResults = searchResults.Where(t => t.DatabaseSource == searchTerms.DatabaseSource - 1).ToList();
+                }
+                //Completed - 0 = All
+                if (searchTerms.Completed != 0)
+                {
+                    if (searchTerms.Completed == 1)
+                    {
+                        searchResults = searchResults.Where(t => t.Completed == true).ToList();
+                    }
+                    if (searchTerms.Completed == 2)
+                    {
+                        searchResults = searchResults.Where(t => t.Completed == false).ToList();
+                    }
+                }
+                //Started - 0 = All
+                if (searchTerms.Started != 0)
+                {
+                    if (searchTerms.Started == 1)
+                    {
+                        searchResults = searchResults.Where(t => t.Started == true).ToList();
+                    }
+                    if (searchTerms.Started == 2)
+                    {
+                        searchResults = searchResults.Where(t => t.Started == false).ToList();
+                    }
+                }
                 ////Date Added - check if before or after (string to int, compare greater than, less than, or equal to)
                 ////create property to hold this value
                 //if (int.Parse(searchTerms.DateAdded.ToString("yyyyMMdd")) != 00010101)
@@ -482,8 +510,9 @@ namespace BacklogManager.Controllers
                 //    searchResults = searchResults.Where(t => t.LastSuggested == searchTerms.LastSuggested).ToList();
                 //}
 
-                searchTerms.MediaObjects = searchResults;
+                
             }
+            searchTerms.MediaObjects = searchResults;
 
             return View(searchTerms);
         }
@@ -494,8 +523,7 @@ namespace BacklogManager.Controllers
             MediaObject selected = context.MediaObjects.Where(i => i.ID == ID).Single();
             selected.SelectedCount += 1;
             context.SaveChanges();
-
-            //ToDo: add title details page
+            
             //ToDo: redirect to details page matching given ID after selection
             return Redirect("/Media/Index");
         }

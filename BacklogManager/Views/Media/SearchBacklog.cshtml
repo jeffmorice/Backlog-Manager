@@ -27,28 +27,38 @@
             </div>
             <div class="form-group">
                 <label asp-for="DatabaseSource" class="control-label"></label>
-                <input asp-for="DatabaseSource" class="form-control" />
-                <span asp-validation-for="DatabaseSource" class="text-danger"></span>
+                <br />
+                @* ToDo: Add more select list items as more APIs are integrated *@
+                @* ToDo: Fix hardcoded solution, used here to display All by default (select lists apparently default to 0, so must offset db values) *@
+                <select asp-for="DatabaseSource">
+                    <option value="0">All</option>
+                    <option value="1">Local</option>
+                    <option value="2">IMDB</option>
+                </select>
             </div>
             <div class="form-group">
-                <div class="checkbox">
-                    <label>
-                        <input asp-for="Completed" /> @Html.DisplayNameFor(model => model.Completed)
-                    </label>
-                </div>
+                <label asp-for="Started" class="control-label"></label>
+                <br />
+                <select asp-for="Started">
+                    <option value="0">All</option>
+                    <option value="1">True</option>
+                    <option value="2">False</option>
+                </select>
             </div>
             <div class="form-group">
-                <div class="checkbox">
-                    <label>
-                        <input asp-for="Started" /> @Html.DisplayNameFor(model => model.Started)
-                    </label>
-                </div>
+                <label asp-for="Completed" class="control-label"></label>
+                <br />
+                <select asp-for="Completed">
+                    <option value="0">All</option>
+                    <option value="1">True</option>
+                    <option value="2">False</option>
+                </select>
             </div>
             @*<div class="form-group">
-                    <label asp-for="DateAdded" class="control-label"></label>
-                    <input asp-for="DateAdded" class="form-control" />
-                    <span asp-validation-for="DateAdded" class="text-danger"></span>
-                </div>*@
+            <label asp-for="DateAdded" class="control-label"></label>
+            <input asp-for="DateAdded" class="form-control" />
+            <span asp-validation-for="DateAdded" class="text-danger"></span>
+        </div>*@
             <div class="form-group">
                 <label asp-for="RecommendSource" class="control-label"></label>
                 <input asp-for="RecommendSource" class="form-control" />
@@ -60,17 +70,16 @@
                 <span asp-validation-for="Interest" class="text-danger"></span>
             </div>
             @*<div class="form-group">
-                    <label asp-for="LastSuggested" class="control-label"></label>
-                    <input asp-for="LastSuggested" class="form-control" />
-                    <span asp-validation-for="LastSuggested" class="text-danger"></span>
-                </div>*@
+            <label asp-for="LastSuggested" class="control-label"></label>
+            <input asp-for="LastSuggested" class="form-control" />
+            <span asp-validation-for="LastSuggested" class="text-danger"></span>
+        </div>*@
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" name="Search" value="Search" class="btn btn-default" />
             </div>
         </form>
     </div>
 </div>
-
 <div>
 
     @* If model != null, display search results *@
@@ -79,6 +88,12 @@
         @if (Model.MediaObjects[0].ExternalId != null)
         {
             <table class="table">
+                <tr>
+                    <th>@Model.MediaObjects.Count results</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th></th>
+                </tr>
                 @foreach (MediaObject title in Model.MediaObjects)
                 {
                     <tr>
@@ -109,9 +124,11 @@
         }
 
     }
-    else
+    else if(Model.Search != null)
     {
+        <hr />
         <p>No results</p>
+        <hr />
     }
 
 </div>
