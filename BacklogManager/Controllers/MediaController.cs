@@ -454,7 +454,22 @@ namespace BacklogManager.Controllers
                 //SubType - 0 = All
                 if (searchTerms.SubTypeID != 0)
                 {
-                    searchResults = searchResults.Where(t => t.SubTypeID == searchTerms.SubTypeID).ToList();
+                    List<int> childIds = GetChildTypesRecursive(searchTerms.SubTypeID);
+                    List<MediaObject> mediaObjects = new List<MediaObject>();
+                    
+                    mediaObjects = searchResults.Where(t => t.SubTypeID == searchTerms.SubTypeID).ToList();
+
+                    foreach (int childId in childIds)
+                    {
+                        List<MediaObject> childMediaObjects = new List<MediaObject>();
+                        childMediaObjects = searchResults.Where(t => t.SubTypeID == childId).ToList();
+
+                        foreach (MediaObject childMediaObject in childMediaObjects)
+                        {
+                            mediaObjects.Add(childMediaObject);
+                        }
+                    }
+                    searchResults = mediaObjects;
                 }
                 //Database - 0 = All
                 if (searchTerms.DatabaseSource != 0)
@@ -735,6 +750,33 @@ namespace BacklogManager.Controllers
             OMDbTitle omdbTitle = await omdbController.GetById(externalId);
 
             return omdbTitle;
+        }
+
+        public List<int> GetChildTypesRecursive(int parentId, List<int> childIds)
+        {
+            List<SubType> childTypes = context.SubTypes.Where(s => s.ParentID == parentId).ToList();
+
+            foreach (SubType childType in childTypes)
+            {
+                childIds.Add(childType.ID);
+                childIds = GetChildTypesRecursive(childType.ID, childIds);
+            }
+
+            return childIds;
+        }
+
+        public List<int> GetChildTypesRecursive(int parentId)
+        {
+            List<SubType> childTypes = context.SubTypes.Where(s => s.ParentID == parentId).ToList();
+            List<int> childIds = new List<int>();
+
+            foreach (SubType childType in childTypes)
+            {
+                childIds.Add(childType.ID);
+                childIds = GetChildTypesRecursive(childType.ID, childIds);
+            }
+
+            return childIds;
         }
 
         //Admin Debug actions
