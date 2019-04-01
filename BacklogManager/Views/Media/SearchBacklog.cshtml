@@ -9,128 +9,128 @@
 <p>
     Find exactly what you're looking for.
 </p>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="SearchBacklog">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="SubTypeID" class="control-label"></label>
-                <br />
-                <select asp-for="SubTypeID" asp-items="Model.SubTypes"></select>
-                <span asp-validation-for="SubTypeID" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DatabaseSource" class="control-label"></label>
-                <br />
+@* ToDo: Refactor search form as a table *@
+<div>
+    <form asp-action="SearchBacklog" id="SearchBacklog"></form>
+    <table class="table">
+        <tr>
+            <th>
+                @if (Model.Search != null)
+                {
+                    <span>Results</span>
+                }
+            </th>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Database</th>
+            <th>Source</th>
+            <th>Interest (1-10)</th>
+            <th>Started</th>
+            <th>Completed</th>
+            <th></th>
+        </tr>
+        <tr>
+            <td>
+                @if (Model.Search != null)
+                {
+                    <span>@Model.MediaObjects.Count</span>
+                }
+            </td>
+            <td>
+                <input asp-for="Title" class="form-control" form="SearchBacklog" />
+            </td>
+            <td>
+                <select asp-for="SubTypeID" asp-items="Model.SubTypes" form="SearchBacklog"></select>
+            </td>
+            <td>
                 @* ToDo: Add more select list items as more APIs are integrated *@
                 @* ToDo: Fix hardcoded solution, used here to display All by default (select lists apparently default to 0, so must offset db values) *@
-                <select asp-for="DatabaseSource">
+                <select asp-for="DatabaseSource" form="SearchBacklog">
                     <option value="0">All</option>
                     <option value="1">Local</option>
                     <option value="2">IMDB</option>
                 </select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Started" class="control-label"></label>
-                <br />
-                <select asp-for="Started">
+            </td>
+            <td>
+                <input asp-for="RecommendSource" class="form-control" form="SearchBacklog" />
+            </td>
+            <td>
+                <input asp-for="Interest" class="form-control" form="SearchBacklog" />
+            </td>
+            <td>
+                <select asp-for="Started" form="SearchBacklog">
                     <option value="0">All</option>
                     <option value="1">True</option>
                     <option value="2">False</option>
                 </select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Completed" class="control-label"></label>
-                <br />
-                <select asp-for="Completed">
+            </td>
+            <td>
+                <select asp-for="Completed" form="SearchBacklog">
                     <option value="0">All</option>
                     <option value="1">True</option>
                     <option value="2">False</option>
                 </select>
-            </div>
-            @*<div class="form-group">
-            <label asp-for="DateAdded" class="control-label"></label>
-            <input asp-for="DateAdded" class="form-control" />
-            <span asp-validation-for="DateAdded" class="text-danger"></span>
-        </div>*@
-            <div class="form-group">
-                <label asp-for="RecommendSource" class="control-label"></label>
-                <input asp-for="RecommendSource" class="form-control" />
-                <span asp-validation-for="RecommendSource" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Interest" class="control-label"></label>
-                <input asp-for="Interest" class="form-control" />
-                <span asp-validation-for="Interest" class="text-danger"></span>
-            </div>
-            @*<div class="form-group">
-            <label asp-for="LastSuggested" class="control-label"></label>
-            <input asp-for="LastSuggested" class="form-control" />
-            <span asp-validation-for="LastSuggested" class="text-danger"></span>
-        </div>*@
-            <div class="form-group">
-                <input type="submit" name="Search" value="Search" class="btn btn-default" />
-            </div>
-        </form>
-    </div>
-</div>
-<div>
+            </td>
+            <td>
+                <input type="submit" name="Search" value="Search" class="btn btn-default" form="SearchBacklog" />
+            </td>
+        </tr>
 
-    @* If model != null, display search results *@
-    @if (Model.MediaObjects.Count != 0)
-    {
-        @if (Model.MediaObjects[0].ExternalId != null)
+        @* ToDo: Display data for all searchable fields in search results *@
+        @* If model != null, display search results *@
+        @if (Model.MediaObjects.Count != 0)
         {
-            <table class="table">
+            @foreach (MediaObject title in Model.MediaObjects)
+            {
                 <tr>
-                    <th>@Model.MediaObjects.Count results</th>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th></th>
+                    @if (title.Image != "N/A" & title.Image != null)
+                    {
+                        <td><img src="@title.Image" height="128" /></td>
+                    }
+                    else
+                    {
+                        <td><img src="https://i.ibb.co/mBByDjW/No-Image-Placeholder.png" height="128" /></td>
+                    }
+                    <td>
+                        <a asp-action="Details" asp-route-id="@title.ID">@title.Title</a>
+                    </td>
+                    <td>@title.MediaSubType.Name</td>
+                    <td>
+                        @if (title.DatabaseSource == 0)
+                        {
+                            <span>Local</span>
+                        }
+                        @if (title.DatabaseSource == 1)
+                        {
+                            <span>IMDB</span>
+                        }
+                    </td>
+                    <td>@title.RecommendSource</td>
+                    <td>@title.Interest</td>
+                    <td>@title.Started</td>
+                    <td>@title.Completed</td>
+                    <td>
+                        <form method="get" asp-controller="Media" asp-action="Add">
+                            <input type="hidden" name="imdbId" value="@title.ExternalId" />
+                            <input type="hidden" name="title" value="@title.Title" />
+                            <input type="hidden" name="type" value="@title.MediaSubType.ID" />
+                            <input type="hidden" name="image" value="@title.Image" />
+                            <input type="submit" value="Add" class="btn btn-default" />
+                        </form>
+                    </td>
                 </tr>
-                @foreach (MediaObject title in Model.MediaObjects)
-                {
-                    <tr>
-                        @if (title.Image != "N/A")
-                        {
-                            <td><img src="@title.Image" height="128" /></td>
-                        }
-                        else
-                        {
-                            <td><img src="https://i.ibb.co/mBByDjW/No-Image-Placeholder.png" height="128" /></td>
-                        }
-                        <td>
-                            <a asp-action="Details" asp-route-id="@title.ID">@title.Title</a>
-                        </td>
-                        <td>@title.MediaSubType.Name</td>
-                        <td>
-                            <form method="get" asp-controller="Media" asp-action="Add">
-                                <input type="hidden" name="imdbId" value="@title.ExternalId" />
-                                <input type="hidden" name="title" value="@title.Title" />
-                                <input type="hidden" name="type" value="@title.MediaSubType.ID" />
-                                <input type="hidden" name="image" value="@title.Image" />
-                                <input type="submit" value="Add" class="btn btn-default" />
-                            </form>
-                        </td>
-                    </tr>
-                }
-            </table>
+            }
         }
+    </table>
+</div>
 
-    }
-    else if(Model.Search != null)
+<div>
+    @if (Model.MediaObjects.Count == 0 & Model.Search != null)
     {
         <hr />
         <p>No results</p>
         <hr />
     }
-
 </div>
 
 <div>

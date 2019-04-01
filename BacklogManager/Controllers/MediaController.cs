@@ -450,7 +450,6 @@ namespace BacklogManager.Controllers
                 if (searchTerms.Title != null)
                 {
                     searchResults = searchResults.Where(t => t.Title.ToLower().Contains(searchTerms.Title.ToLower())).ToList();
-                    //searchResults = searchResults.Where(t => EF.Functions.Like(t.Title, searchTerms.Title)).ToList();
                 }
                 //SubType - 0 = All
                 if (searchTerms.SubTypeID != 0)
@@ -497,7 +496,19 @@ namespace BacklogManager.Controllers
                 //Recommendation Source
                 if (searchTerms.RecommendSource != null)
                 {
-                    searchResults = searchResults.Where(t => EF.Functions.Like(t.RecommendSource, searchTerms.RecommendSource)).ToList();
+                    //searchResults = searchResults.Where(t => t.RecommendSource.ToString().ToLower().Contains(searchTerms.RecommendSource.ToLower())).ToList();
+                    List<MediaObject> refinedResults = new List<MediaObject>();
+                    foreach (MediaObject mediaObject in searchResults)
+                    {
+                        if (mediaObject.RecommendSource != null)
+                        {
+                            if (mediaObject.RecommendSource.ToLower().Contains(searchTerms.RecommendSource.ToLower()))
+                            {
+                                refinedResults.Add(mediaObject);
+                            }
+                        }
+                    }
+                    searchResults = refinedResults;
                 }
                 //Interest - check for greater, less than, equal to?
                 if (searchTerms.Interest != 0)
