@@ -432,7 +432,7 @@ namespace BacklogManager.Controllers
             return View(suggestionViewModelA);
         }
 
-        public IActionResult SearchBacklog(SearchBacklogViewModel searchTerms)
+        public IActionResult SearchBacklog(SearchBacklogViewModel searchTerms, int subTypeId)
         {
             string userId = Common.ExtensionMethods.getUserId(this.User);
             searchTerms.SubTypes = GetSelectListSubTypes();

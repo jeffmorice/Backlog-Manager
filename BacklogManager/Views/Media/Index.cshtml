@@ -10,9 +10,14 @@
 @if (Model.MediaBySubTypeViewModels.Count != 1)
 {
     <h1><strong>My Backlog</strong> (@Model.BacklogCount)</h1>
-    <p>
-        Find all titles in your Backlog listed here.
-    </p>
+    @if (Model.MediaBySubTypeViewModels.Count != 0)
+    {
+        <p>Find all titles in your Backlog listed here.</p>
+    }
+    else
+    {
+        <p>No Media in Backlog, <a asp-action="Search">Add some</a>.</p>
+    }
 }
 
 @if (Model.MediaBySubTypeViewModels.Count != 0)
@@ -27,7 +32,8 @@
                 </a>
                 | <input type="submit" form="@mbstvm.MediaSubType.Name" value="Save Changes" />
             </h4>
-            <p><a asp-action="RandomSuggestion" asp-route-id="@mbstvm.MediaSubType.ID">Random @mbstvm.MediaSubType.Name</a> | <a asp-action="WeightedSuggestion" asp-route-id="@mbstvm.MediaSubType.ID">Weighted @mbstvm.MediaSubType.Name</a>
+            <p>
+                <a asp-action="RandomSuggestion" asp-route-id="@mbstvm.MediaSubType.ID">Random @mbstvm.MediaSubType.Name</a> | <a asp-action="WeightedSuggestion" asp-route-id="@mbstvm.MediaSubType.ID">Weighted @mbstvm.MediaSubType.Name</a> | <a asp-action="SearchBacklog" asp-route-subTypeId="@mbstvm.MediaSubType.ID">@mbstvm.MediaSubType.Name Search</a>
             </p>
 
             <form method="post" id="@mbstvm.MediaSubType.Name" asp-action="Update">
@@ -52,7 +58,7 @@
                                 @mediaObject.RecommendSource
                             </td>
                             <td>
-                                <input type="number" name="interest" id="@mediaObject.ID" value="@mediaObject.Interest" />
+                                <input type="number" name="interest" id="@mediaObject.ID" value="@mediaObject.Interest" class="form-control inputNumber"/>
                             </td>
                             <td>
                                 <input type="hidden" name="startedValues" id="@mediaObject.ID" value="0" />
@@ -71,7 +77,4 @@
     }
 
 }
-else
-{
-    <p>No Media in Backlog, <a asp-action="Search">Add some</a>.</p>
-}
+
