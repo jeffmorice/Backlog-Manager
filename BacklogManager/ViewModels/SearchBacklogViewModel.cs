@@ -25,6 +25,7 @@ namespace BacklogManager.ViewModels
         public string RecommendSource { get; set; }
         [Display(Name = "Interest Level")]
         public int Interest { get; set; }
+        public int InterestOperator { get; set; }
         [Display(Name = "Date Added")]
         public DateTime DateAdded { get; set; }
         [Display(Name = "Date Last Suggested")]

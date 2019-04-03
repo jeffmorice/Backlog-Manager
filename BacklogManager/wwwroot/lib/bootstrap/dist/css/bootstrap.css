@@ -6754,4 +6754,7 @@ button.close {
     display: none !important;
   }
 }
+.inputNumber {
+    width: 65px;
+}
 /*# sourceMappingURL=bootstrap.css.map */

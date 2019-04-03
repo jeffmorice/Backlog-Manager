@@ -528,7 +528,23 @@ namespace BacklogManager.Controllers
                 //Interest - check for greater, less than, equal to?
                 if (searchTerms.Interest != 0)
                 {
-                    searchResults = searchResults.Where(t => t.Interest == searchTerms.Interest).ToList();
+                    //equal, greater than, less than, + or - 1
+                    if (searchTerms.InterestOperator == 0)
+                    {
+                        searchResults = searchResults.Where(t => t.Interest == searchTerms.Interest).ToList();
+                    }
+                    if (searchTerms.InterestOperator == 1)
+                    {
+                        searchResults = searchResults.Where(t => t.Interest > searchTerms.Interest).ToList();
+                    }
+                    if (searchTerms.InterestOperator == 2)
+                    {
+                        searchResults = searchResults.Where(t => t.Interest < searchTerms.Interest).ToList();
+                    }
+                    if (searchTerms.InterestOperator == 3)
+                    {
+                        searchResults = searchResults.Where(t => t.Interest == searchTerms.Interest || t.Interest == searchTerms.Interest + 1 || t.Interest == searchTerms.Interest - 1).ToList();
+                    }
                 }
                 ////Date Last Suggested - check if before or after
                 //if (int.Parse(searchTerms.LastSuggested.ToString("yyyyMMdd")) != 00010101)
