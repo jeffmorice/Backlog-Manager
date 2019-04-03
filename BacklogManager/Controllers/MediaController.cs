@@ -436,6 +436,7 @@ namespace BacklogManager.Controllers
         {
             string userId = Common.ExtensionMethods.getUserId(this.User);
             searchTerms.SubTypes = GetSelectListSubTypes();
+            searchTerms.SubTypes[0].Text = "All";
             List<MediaObject> searchResults = new List<MediaObject>();
 
             if (searchTerms.Search != null) //runs no matter what
