@@ -14,12 +14,11 @@
     <form asp-action="SearchBacklog" id="SearchBacklog"></form>
     <table class="table">
         <tr>
-            <th>
-                @if (Model.Search != null)
-                {
-                    <span>Results</span>
-                }
-            </th>
+
+            @if (Model.Search != null)
+            {
+                <th>Results</th>
+            }
             <th>Title</th>
             <th>Type</th>
             <th>Database</th>
@@ -31,12 +30,10 @@
             <th></th>
         </tr>
         <tr>
-            <td>
-                @if (Model.Search != null)
-                {
-                    <span>@Model.MediaObjects.Count</span>
-                }
-            </td>
+            @if (Model.Search != null)
+            {
+                <td>@Model.MediaObjects.Count</td>
+            }
             <td>
                 <input asp-for="Title" class="form-control" form="SearchBacklog" />
             </td>
