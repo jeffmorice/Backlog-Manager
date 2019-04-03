@@ -18,12 +18,12 @@
             <div class="form-group">
                 <label asp-for="SubTypeID" class="control-label"></label>
                 <br />
-                <select asp-for="SubTypeID" asp-items="Model.SubTypes"></select>
+                <select asp-for="SubTypeID" asp-items="Model.SubTypes" class="form-control"></select>
                 <span asp-validation-for="SubTypeID" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Interest" class="control-label"></label>
-                <input asp-for="Interest" class="form-control" />
+                <input asp-for="Interest" class="form-control" min="1" max="10" />
                 <span asp-validation-for="Interest" class="text-danger"></span>
             </div>
             <div class="form-group">

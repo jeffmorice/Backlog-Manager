@@ -64,7 +64,7 @@
                 </select>
             </td>
             <td>
-                <input asp-for="Interest" class="form-control inputNumber" form="SearchBacklog" />
+                <input asp-for="Interest" class="form-control inputNumber" form="SearchBacklog" min="0" max="10" />
             </td>
             <td>
                 <select asp-for="Started" form="SearchBacklog" class="form-control" >

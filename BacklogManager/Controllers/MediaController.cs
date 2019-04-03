@@ -525,10 +525,10 @@ namespace BacklogManager.Controllers
                     }
                     searchResults = refinedResults;
                 }
-                //Interest - check for greater, less than, equal to?
-                if (searchTerms.Interest != 0)
+                //Interest - 0-10
+                if (1 <= searchTerms.Interest & searchTerms.Interest <= 10)
                 {
-                    //equal, greater than, less than, + or - 1
+                    //check for equal to, greater than, less than, +or - 1
                     if (searchTerms.InterestOperator == 0)
                     {
                         searchResults = searchResults.Where(t => t.Interest == searchTerms.Interest).ToList();
